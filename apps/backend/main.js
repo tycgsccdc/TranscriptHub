@@ -84,15 +84,9 @@ const { validate_params } = require('./middlewares/validate_params.js');
  * 
  * __DEV__: Development mode
  * - Enables debug logging
- * - Disables SSL verification
- * - Uses test database
- * - Enables verbose error messages
  * 
  * __PROD__: Production mode
  * - Minimal logging
- * - Enforces SSL verification
- * - Uses production database
- * - Security-focused error messages
  */
 const { __DEV__, __PROD__ } = require('./env.js');
 
