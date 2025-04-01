@@ -1,0 +1,39 @@
+USE [AI_AP]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[TASK](
+	[OBJID] [bigint] IDENTITY(1,1) NOT NULL,
+	[CREATE_AT] [datetime2](7) NULL,
+	[ORIGINAL_FILENAME] [nvarchar](64) NULL,
+	[FILENAME] [nvarchar](64) NULL,
+	[STATUS] [int] NULL,
+	[ROUTE] [nvarchar](100) NULL,
+	[REF] [bigint] NULL,
+	[FINISH_AT] [datetime2](7) NULL,
+	[EXEC_AT] [datetime2](7) NULL,
+	[TRANSCRIBE] [int] NULL,
+	[LABEL] [nvarchar](64) NULL,
+	[PID] [int] NULL,
+	[SSO_ACCOUNT] [nvarchar](64) NULL,
+	[FILE_SIZE] [int] NULL,
+	[CONTENT_LENGTH] [int] NULL,
+	[DIARIZE] [int] NOT NULL,
+	[RETRY] [int] NOT NULL,
+	[DURATION] [float] NULL,
+	[IS_DELETE] [int] NULL
+) ON [PRIMARY]
+GO
+
+ALTER TABLE [dbo].[TASK] ADD  DEFAULT ((0)) FOR [DIARIZE]
+GO
+
+ALTER TABLE [dbo].[TASK] ADD  DEFAULT ((0)) FOR [RETRY]
+GO
+
+

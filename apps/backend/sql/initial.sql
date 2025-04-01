@@ -1,0 +1,15 @@
+-- Create OBJID sequence
+USE [AI_AP]
+GO
+CREATE SEQUENCE [dbo].[hibernate_sequence] 
+ AS [bigint]
+ START WITH 10000000
+ INCREMENT BY 1
+ MINVALUE -9223372036854775808
+ MAXVALUE 9223372036854775807
+ CACHE 
+GO
+
+-- Environment setup
+-- Enable manual insert of OBJID
+SET IDENTITY_INSERT ACCESS_OPERATION ON;
