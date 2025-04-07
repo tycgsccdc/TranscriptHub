@@ -59,26 +59,32 @@ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
    -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-3. **初始化資料庫**
+3. **Clone 專案**
+   ```sh
+   git clone https://github.com/AS-AIGC/TranscriptHub.git
+   cd TranscriptHub/apps/backend/
+   ```
+
+4. **初始化資料庫**
 執行 SQL 腳本：
 - sql/initial.sql
 - sql/task.sql
 - sql/access_operation.sql
 - sql/access_operation_error.sql
 
-4. **設定環境變數**
+5. **設定環境變數**
 ```bash
 cp .env.example .env
 cp config.json.example config.json
 # 編輯設定檔內容
 ```
 
-5. **安裝 Node.js 相依套件**
+6. **安裝 Node.js 相依套件**
 ```bash
 npm ci
 ```
 
-6. **啟動服務**
+7. **啟動服務**
 ```bash
 ./run.sh {start|stop|status|restart}
 ```
@@ -186,26 +192,32 @@ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
    -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-3. **Initialize Database**
+3. **Clone the Project**
+   ```sh
+   git clone https://github.com/AS-AIGC/TranscriptHub.git
+   cd TranscriptHub
+   ```
+
+4. **Initialize Database**
 Execute SQL scripts:
 - sql/initial.sql
 - sql/task.sql
 - sql/access_operation.sql
 - sql/access_operation_error.sql
 
-4. **Configure Environment**
+5. **Configure Environment**
 ```bash
 cp .env.example .env
 cp config.json.example config.json
 # Edit configuration files
 ```
 
-5. **Install Node.js Dependencies**
+6. **Install Node.js Dependencies**
 ```bash
 npm ci
 ```
 
-6. **Start Service**
+7. **Start Service**
 ```bash
 ./run.sh {start|stop|status|restart}
 ```

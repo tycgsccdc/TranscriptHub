@@ -1,6 +1,6 @@
 # Academia Sinica AI Suite (AISuite)
 
-AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供錄音檔案轉逐字稿的功能，並支援多種格式的檔案上傳與處理。此專案包含前端頁面與後端 API 及 AI 部分（於另外專案中）的整合，並結合中央研究院的 SSO 登入系統（open source 版本未提供，需自行整合各單位之認證、或自行開發登入套件）。
+AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供錄音檔案轉逐字稿的功能，並支援多種格式的檔案上傳與處理。此專案包含前端頁面與後端服務。
 
 ---
 
@@ -8,7 +8,7 @@ AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供�
 
 - 支援 MP3、WAV 等音訊格式的逐字稿轉換。
 - 提供多語言的前端頁面模板。
-- 支援 Docker 部署及 windows 系統的安裝，可快速啟動服務。
+- 支援 Docker 部署及 Windows 系統的安裝，可快速啟動服務。
 - 提供 RESTful API，方便整合其他系統或與 AI 整合。
 - 自動化 Email 通知功能，提醒用戶處理結果。
 
@@ -31,7 +31,7 @@ AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供�
 1. **Clone 專案**
    ```sh
    git clone https://github.com/AS-AIGC/TranscriptHub.git
-   cd openaisuite
+   cd TranscriptHub/apps/frontend/
    ```
 
 2. **安裝依賴套件**
@@ -119,40 +119,138 @@ AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供�
 
 ---
 
-## 貢獻方式
-
-1. **Fork 專案**
-   ```sh
-   git fork https://github.com/your-repo/openaisuite.git
-   ```
-
-2. **建立分支**
-   ```sh
-   git checkout -b feature/YourFeature
-   ```
-
-3. **提交修改**
-   ```sh
-   git commit -m "Add YourFeature"
-   ```
-
-4. **推送分支**
-   ```sh
-   git push origin feature/YourFeature
-   ```
-
-5. **建立 Pull Request**
-
----
-
 ## 授權
 
 本專案採用 MIT 授權條款，詳見 LICENSE。
 
+```
+
+### 英文版本
+
+```markdown
+# Academia Sinica AI Suite (AISuite)
+
+AISuite is an AI toolkit designed specifically for Academia Sinica, mainly providing transcription services for audio files and supporting multiple file formats for upload and processing. This project includes both frontend pages and backend services.
+
 ---
 
-## 聯絡方式
+## Features
 
-- **Email**: its@sinica.edu.tw
-- **電話**: +886-2-2789-8855
-- **線上服務台**: [https://its.sinica.edu.tw/online](https://its.sinica.edu.tw/online)
+- Supports transcription for audio formats such as MP3 and WAV.
+- Provides multilingual front-end page templates.
+- Supports Docker deployment and Windows installation for quick service startup.
+- Offers RESTful API for easy integration with other systems or AI.
+- Automated email notification feature to notify users of processing results.
+
+---
+
+## System Requirements
+
+- **Go** version 1.22 or above
+- **Docker** (optional)
+- **ffmpeg** (audio processing tool)
+- **SMTP Server** (for email notifications)
+- **AI Whisper** (to be prepared by the user)
+
+---
+
+## Installation
+
+### Method 1: Install from Source Code
+
+1. **Clone the Project**
+   ```sh
+   git clone https://github.com/AS-AIGC/TranscriptHub.git
+   cd TranscriptHub
+   ```
+
+2. **Install Dependencies**
+   ```sh
+   go mod tidy
+   ```
+
+3. **Build the Project**
+   - Linux:
+     ```sh
+     make build
+     ```
+   - Windows:
+     ```sh
+     make build-win
+     ```
+
+4. **Start the Service**
+   ```sh
+   ./app
+   ```
+
+5. **Open Browser**
+   The default service runs at `http://localhost:80` (port 80 can be configured in makefile and envfile).
+
+---
+
+### Method 2: Deploy with Docker (Recommended)
+Before using Docker, make sure you have a working Docker environment installed.
+
+1. **Build Docker Image**
+   ```sh
+   make docker
+   ```
+
+2. **Start the Container**
+   ```sh
+   make run
+   ```
+
+3. **Check Logs**
+   ```sh
+   make log
+   ```
+
+4. **Stop the Container**
+   ```sh
+   make stop
+   ```
+
+---
+
+## Environment Variables Configuration
+
+Set the following parameters in the envfile located in the project's root directory (refer to .env for instructions, or rename .env to envfile and modify):
+
+| Parameter Name         | Description                            | Default Value               |
+|------------------------|----------------------------------------|-----------------------------|
+| `SystemName`           | System Name                            | `Open AI Suite`             |
+| `PORT`                 | Service Port                           | `80`                        |
+| `ContainerName`        | Docker Container Name                  | `openaisuite`               |
+| `DocumentRoot`         | Static File Root Directory             | html                        |
+| `TemplateRoot`         | Template File Root Directory           | template                    |
+| `UploadFolder`         | Upload File Storage Directory          | tmp                         |
+| `JobsFile`             | Job List File Name                     | joblists                    |
+| `mailHost`             | SMTP Host                              | `smtp.yourdomain.com`       |
+| `smtpPort`             | SMTP Port                              | `25`                        |
+| `smtpEmail`            | SMTP Sender Email                      | `notify@yourdomain.com`     |
+| `TranslateUrl`         | Translation Service API URL            | `https://10.0.0.1:8080/api/v1/rest/CreateTranscribeTask` |
+| `TranslateQueryUrl`    | Translation Service Query API URL      | `https://10.0.0.1:8080/api/v1/rest/ViewAllTask` |
+| `DownloadServer`       | Download Service URL                   | `https://10.0.0.2:8080/api/v1/rest/RetrieveTranscribe/` |
+| `MaxUploadSize`        | Maximum Upload File Size (MB)          | `290`                       |
+
+---
+
+## API Routes
+
+| Route                     | Method | Description                            |
+|---------------------------|--------|----------------------------------------|
+| `/upload`                 | POST   | Upload Audio File                      |
+| `/query/jobs`             | GET    | Query User's Job List                  |
+| `/listall/jobs`           | GET    | Query All Job Lists                    |
+| `/result/{taskID}/{type}` | GET    | Download Processing Result             |
+| `/del/{taskID}`           | DELETE | Delete Specified Job                   |
+
+---
+
+## License
+
+This project is licensed under the MIT License. See LICENSE for more information.
+
+```
