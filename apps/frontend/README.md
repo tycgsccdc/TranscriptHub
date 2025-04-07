@@ -30,7 +30,7 @@ AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供�
 
 1. **Clone 專案**
    ```sh
-   git clone https://github.com/your-repo/.......git
+   git clone https://github.com/AS-AIGC/TranscriptHub.git
    cd openaisuite
    ```
 
@@ -97,12 +97,12 @@ AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供�
 | `TemplateRoot`        | 模板檔案根目錄                        | template            |
 | `UploadFolder`        | 上傳檔案存放目錄                      | tmp                     |
 | `JobsFile`            | 工作列表檔案名稱                      | joblists                 |
-| `mailHost`            | SMTP 主機                             | `smtp.sinica.edu.tw`       |
+| `mailHost`            | SMTP 主機                             | `smtp.yourdomain.com`       |
 | `smtpPort`            | SMTP 埠號                             | `25`                       |
-| `smtpEmail`           | SMTP 發送者 Email                     | `its@sinica.edu.tw`        |
-| `TranslateUrl`        | 翻譯服務 API URL                      | `https://10.109.190.11:8080/api/v1/rest/CreateTranscribeTask` |
-| `TranslateQueryUrl`   | 翻譯服務查詢 API URL                  | `https://10.109.190.11:8080/api/v1/rest/ViewAllTask` |
-| `DownloadServer`      | 下載服務 URL                          | `https://172.18.124.200:8080/api/v1/rest/RetrieveTranscribe/` |
+| `smtpEmail`           | SMTP 發送者 Email                     | `notify@yourdomain.com`        |
+| `TranslateUrl`        | 翻譯服務 API URL                      | `https://10.0.0.1:8080/api/v1/rest/CreateTranscribeTask` |
+| `TranslateQueryUrl`   | 翻譯服務查詢 API URL                  | `https://10.0.0.1:8080/api/v1/rest/ViewAllTask` |
+| `DownloadServer`      | 下載服務 URL                          | `https://10.0.0.2:8080/api/v1/rest/RetrieveTranscribe/` |
 | `MaxUploadSize`       | 最大上傳檔案大小（MB）                | `290`                      |
 
 ---
