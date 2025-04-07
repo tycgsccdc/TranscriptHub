@@ -1,142 +1,192 @@
-# Sparrow AI Transcription Platform / Sparrow 語音轉錄平台
+# Sparrow AI 語音轉錄平台 - 後端服務
 
-A comprehensive HTTP server and RESTful API platform designed for AI-driven audio transcription services. / 一個為 AI 語音轉錄設計的完整 HTTP 伺服器與 RESTful API 平台。
+基於 Node.js 與 WhisperX 的企業級語音轉錄系統後端服務。
 
-This application leverages the WhisperX speech recognition engine, supports multiple languages and audio formats, and is optimized for concurrent task execution using Node.js cluster. It includes robust task management, database persistence, speaker diarization, and secure output retrieval. / 本應用使用 WhisperX 語音辨識引擎，支援多語言與多種音訊格式，並透過 Node.js cluster 模組實現多工任務處理，具備任務管理、資料庫保存、說話者分離以及安全下載功能。
+## 🌟 主要功能
 
----
+- 🎯 高效能多工處理架構
+  - Node.js cluster 多核心運算
+  - 自動工作程序管理
+  - 任務狀態即時追蹤
 
-## ✨ Key Features / 特色功能
+- 🔐 企業級安全性
+  - HTTPS 安全連線
+  - SSO 單一登入整合
+  - 檔案存取權限控制
 
-- 🧒 AI transcription using WhisperX / 使用 WhisperX 進行 AI 語音轉錄
-- 🧵 Multi-core processing via Node.js cluster / 透過 Node.js cluster 進行多核心處理
-- 🔄 Automatic worker process recovery / 自動重啟失敗的工作程序
-- 🔐 HTTPS support / 支援 HTTPS 安全連線
-- 🎷 Upload and transcribe MP3, WAV, MPEG, and more / 支援多種音訊格式上傳與轉錄（如 MP3、WAV、MPEG）
-- 📊 Task tracking and status management / 任務狀態追蹤與管理
-- 🗃️ SQL Server database integration / 整合 SQL Server 資料庫
-- 📤 Multiple output formats: TXT, SRT, VTT, TSV, JSON / 多種輸出格式：TXT、SRT、VTT、TSV、JSON
-- 🢑 Speaker diarization support / 支援說話者分離
+- 🎛 彈性輸出格式
+  - 純文字腳本 (TXT)
+  - 字幕檔案 (SRT, VTT)
+  - 結構化資料 (JSON, TSV)
+  - 說話者分離標註
 
----
+## 🚀 快速開始
 
-## 📦 API Endpoints / API 接口
+### 系統需求
+- Node.js v18.20.3+
+- Anaconda/Miniconda
+- SQL Server 2019+
+- CUDA 支援的 GPU (建議)
 
-| Method | Endpoint                                                             | Description / 描述                 |
-|--------|----------------------------------------------------------------------|------------------------------------|
-| POST   | `/api/v1/rest/CreateTranscribeTask`                                  | Create a new transcription task / 建立新轉錄任務 |
-| POST   | `/api/v1/rest/CancelTask`                                            | Cancel a running task / 取消執行中任務 |
-| POST   | `/api/v1/rest/ViewAllTask`                                           | View all task statuses / 查看所有任務狀態 |
-| GET    | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}`                | Retrieve results by format / 下載指定格式的結果 |
+### 安裝步驟
 
----
+1. **設定 Conda 環境**
+```bash
+# 建立 conda 環境
+conda create -n whisperx python=3.8
 
-## 🚀 Quick Start Guide / 快速開始指南
+# 啟動環境
+conda activate whisperx
 
-### 1️⃣ Install WhisperX / 安裝 WhisperX  
-Follow the official [WhisperX GitHub](https://github.com/m-bain/whisperx) guide. / 請依官方 GitHub 指引安裝 WhisperX。
+# 安裝 WhisperX
+pip install git+https://github.com/m-bain/whisperx.git
 
-### 2️⃣ Install SQL Server (via Docker) / 使用 Docker 安裝 SQL Server
+# 安裝相依套件
+pip install -r requirements.txt
+```
 
+2. **安裝資料庫**
 ```bash
 docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
    -p 1433:1433 --name sqlserver \
    -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
-### 3️⃣ Clone this project / 下載本專案
+3. **初始化資料庫**
+執行 SQL 腳本：
+- sql/initial.sql
+- sql/task.sql
+- sql/access_operation.sql
+- sql/access_operation_error.sql
 
+4. **設定環境變數**
 ```bash
-git clone https://github.com/your-org/sparrow-transcriber.git
-cd sparrow-transcriber
+cp .env.example .env
+cp config.json.example config.json
+# 編輯設定檔內容
 ```
 
-### 4️⃣ Initialize the database / 初始化資料庫
-
-Execute SQL files in order: / 依序執行下列 SQL 檔案：
-
-```sql
-sql/initial.sql
-sql/task.sql
-sql/access_operation.sql
-sql/access_operation_error.sql
+5. **安裝 Node.js 相依套件**
+```bash
+npm ci
 ```
 
-### 5️⃣ Install Node.js & Dependencies / 安裝 Node.js 與套件
-
+6. **啟動服務**
 ```bash
-npm install
+./run.sh {start|stop|status|restart}
 ```
 
-### 6️⃣ Configure settings / 設定環境檔案
+### 注意事項
+- 轉錄任務腳本名稱需同步更新：
+  - `scripts/transcribe.py`
+  - `config.js` 中的 `TASK_SCRIPT` 設定
+  - `run.sh` 中的腳本路徑
 
-- Copy and modify `scripts/config.json.example` → `scripts/config.json`
-- Copy and modify `.env.example` → `.env`
+## 📚 API 文件
 
-### 7️⃣ Edit `run.sh`
+### 任務管理
+| 方法 | 路徑 | 說明 |
+|------|------|------|
+| POST | `/api/v1/rest/CreateTranscribeTask` | 建立轉錄任務 |
+| POST | `/api/v1/rest/CancelTask` | 取消執行任務 |
+| POST | `/api/v1/rest/ViewAllTask` | 查看任務狀態 |
+| GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | 下載轉錄結果 |
 
-Set the following variables: / 設定以下變數：
+---
 
+# Sparrow AI Transcription Platform - Backend Service
+
+Enterprise-grade audio transcription backend service based on Node.js and WhisperX.
+
+## 🌟 Key Features
+
+- 🎯 High-Performance Architecture
+  - Multi-core processing with Node.js cluster
+  - Automatic worker process management
+  - Real-time task status tracking
+
+- 🔐 Enterprise Security
+  - HTTPS support
+  - SSO integration
+  - File access control
+
+- 🎛 Flexible Output Formats
+  - Plain text transcripts (TXT)
+  - Subtitle files (SRT, VTT)
+  - Structured data (JSON, TSV)
+  - Speaker diarization
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js v18.20.3+
+- Anaconda/Miniconda
+- SQL Server 2019+
+- CUDA-capable GPU (recommended)
+
+### Installation Steps
+
+1. **Setup Conda Environment**
 ```bash
-NODEJS_APP="./main.js"
-WHISPERX_TASK="exec_whisperx_task_v1.0.py"
-```
+# Create conda environment
+conda create -n whisperx python=3.8
 
-### 8️⃣ Install Python dependencies / 安裝 Python 套件
+# Activate environment
+conda activate whisperx
 
-```bash
-cd scripts/
+# Install WhisperX
+pip install git+https://github.com/m-bain/whisperx.git
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-> You may need to generate `requirements.txt` manually. / 如尚未產生，請依照程式引入自行建立 `requirements.txt`
-
-### 9️⃣ Generate required certificates / 建立憑證供 `config.js` 使用
-
-If using HTTPS, reference your certs in `config.js`. / 若需啟用 HTTPS，請在 `config.js` 中設定憑證路徑。
-
----
-
-## 📁 Project Structure / 專案結構
-
+2. **Setup Database**
 ```bash
-.
-├── backend/                 # Backend API server code and core logic
-│   ├── controllers/        # Request handlers and business logic
-│   ├── models/            # Database models and data structures
-│   ├── routes/            # API route definitions
-│   └── services/          # Business service implementations
-├── scripts/                # Python processing scripts
-│   ├── whisperx/         # WhisperX integration scripts
-│   ├── config.json       # Configuration settings
-│   └── requirements.txt  # Python dependencies
-├── sql/                    # Database initialization scripts
-│   ├── initial.sql       # Database schema
-│   ├── task.sql         # Task management tables
-│   └── access.sql       # Access control tables
-├── .env.example           # Environment variables template
-├── config.js              # Application configuration
-├── run.sh                 # Main execution script
-└── README.md              # Project documentation
-```
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
+   -p 1433:1433 --name sqlserver \
+   -d mcr.microsoft.com/mssql/server:2022-latest
 ```
 
----
+3. **Initialize Database**
+Execute SQL scripts:
+- sql/initial.sql
+- sql/task.sql
+- sql/access_operation.sql
+- sql/access_operation_error.sql
 
-## 📄 License / 授權條款
+4. **Configure Environment**
+```bash
+cp .env.example .env
+cp config.json.example config.json
+# Edit configuration files
+```
 
-MIT or your preferred license here. / 本專案使用 MIT 或你自定的授權條款。
+5. **Install Node.js Dependencies**
+```bash
+npm ci
+```
 
----
+6. **Start Service**
+```bash
+./run.sh {start|stop|status|restart}
+```
 
-## 🧑‍💻 Maintainers / 專案維護者
+### Important Notes
+- Transcription script name must be synchronized in:
+  - `scripts/transcribe.py`
+  - `TASK_SCRIPT` setting in `config.js`
+  - Script path in `run.sh`
 
-- [Your Name](https://github.com/your-name)
-- [Team or Organization](https://your-org.github.io)
+## 📚 API Documentation
 
----
+### Task Management
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/rest/CreateTranscribeTask` | Create transcription task |
+| POST | `/api/v1/rest/CancelTask` | Cancel running task |
+| POST | `/api/v1/rest/ViewAllTask` | View task status |
+| GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | Download results |
 
-## ✨ Contributions / 貢獻
-
-Pull requests are welcome. For major changes, please open an issue first. / 歡迎提交 Pull Request，若為重大修改請先開 issue 討論。
-
+## 📄 License
+MIT License
