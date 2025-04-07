@@ -2,6 +2,13 @@
 
 基於 Node.js 與 WhisperX 的企業級語音轉錄系統後端服務。
 
+## Table of Contents
+- [主要功能](#主要功能)
+- [快速開始](#快速開始)
+- [API 文件](#API-文件)
+- [專案目錄結構](#專案目錄結構)
+- [License](#License)
+
 ## 🌟 主要功能
 
 - 🎯 高效能多工處理架構
@@ -91,6 +98,36 @@ npm ci
 | POST | `/api/v1/rest/CancelTask` | 取消執行任務 |
 | POST | `/api/v1/rest/ViewAllTask` | 查看任務狀態 |
 | GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | 下載轉錄結果 |
+
+
+## 🗂 專案目錄結構
+apps/backend/
+├── controller/               # 控制器目錄
+├── middlewares/              # 中介軟體目錄
+├── scripts/                  # 腳本目錄
+│   ├── transcribe.py         # 轉錄任務腳本
+├── services/                 # 服務目錄
+├── sql/                      # SQL 腳本目錄
+│   ├── initial.sql           # 初始化資料庫腳本
+│   ├── task.sql              # 任務相關資料庫腳本
+│   ├── access_operation.sql  # 存取操作資料庫腳本
+│   ├── access_operation_error.sql  # 存取操作錯誤資料庫腳本
+├── .env.example              # 環境變數範例檔案
+├── README.md                 # 專案說明文件
+├── config.js                 # 主要設定檔
+├── constants.js              # 常量定義檔
+├── db.js                     # 資料庫設定檔
+├── env.js                    # 環境設定檔
+├── logger-writer.js          # 日誌寫入模組
+├── logger.js                 # 日誌模組
+├── main.js                   # 主程式入口
+├── package-lock.json         # Node.js 鎖定檔案
+├── package.json              # Node.js 專案設定檔
+├── query_constants.js        # 查詢常量定義檔
+├── requirements.txt          # Python 相依套件列表
+├── run.sh                    # 啟動服務腳本
+├── shared.js                 # 共享模組
+├── utils.js                  # 工具函數模組
 
 ---
 
@@ -187,6 +224,35 @@ npm ci
 | POST | `/api/v1/rest/CancelTask` | Cancel running task |
 | POST | `/api/v1/rest/ViewAllTask` | View task status |
 | GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | Download results |
+
+## 🗂 Project Directory Architecture
+apps/backend/
+├── controller/               # Controllers directory
+├── middlewares/              # Middlewares directory
+├── scripts/                  # Scripts directory
+│   ├── transcribe.py         # Transcription task script
+├── services/                 # Services directory
+├── sql/                      # SQL scripts directory
+│   ├── initial.sql           # Initialize database script
+│   ├── task.sql              # Task-related database script
+│   ├── access_operation.sql  # Access operation database script
+│   ├── access_operation_error.sql  # Access operation error database script
+├── .env.example              # Example environment variable file
+├── README.md                 # Project documentation file
+├── config.js                 # Main configuration file
+├── constants.js              # Constants definition file
+├── db.js                     # Database configuration file
+├── env.js                    # Environment configuration file
+├── logger-writer.js          # Logger writer module
+├── logger.js                 # Logger module
+├── main.js                   # Main application entry point
+├── package-lock.json         # Node.js lock file
+├── package.json              # Node.js project configuration file
+├── query_constants.js        # Query constants definition file
+├── requirements.txt          # Python dependencies list
+├── run.sh                    # Service start script
+├── shared.js                 # Shared functions module
+├── utils.js                  # Utilities functions module
 
 ## 📄 License
 MIT License
