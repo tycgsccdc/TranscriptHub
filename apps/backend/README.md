@@ -101,6 +101,7 @@ npm ci
 
 
 ## 🗂 專案目錄結構
+```
 apps/backend/
 ├── controller/               # 控制器目錄
 ├── middlewares/              # 中介軟體目錄
@@ -128,7 +129,7 @@ apps/backend/
 ├── run.sh                    # 啟動服務腳本
 ├── shared.js                 # 共享模組
 ├── utils.js                  # 工具函數模組
-
+```
 ---
 
 # Sparrow AI Transcription Platform - Backend Service
@@ -226,6 +227,7 @@ npm ci
 | GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | Download results |
 
 ## 🗂 Project Directory Architecture
+```
 apps/backend/
 ├── controller/               # Controllers directory
 ├── middlewares/              # Middlewares directory
@@ -253,6 +255,6 @@ apps/backend/
 ├── run.sh                    # Service start script
 ├── shared.js                 # Shared functions module
 ├── utils.js                  # Utilities functions module
-
+```
 ## 📄 License
 MIT License
