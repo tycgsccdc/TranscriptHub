@@ -46,7 +46,7 @@ conda create -n whisperx python=3.8
 conda activate whisperx
 
 # 安裝 WhisperX
-pip install git+https://github.com/m-bain/whisperx.git
+請依官方 GitHub 指引安裝 [WhisperX GitHub](https://github.com/m-bain/whisperx)。
 
 # 安裝相依套件
 pip install -r requirements.txt
@@ -179,7 +179,7 @@ conda create -n whisperx python=3.8
 conda activate whisperx
 
 # Install WhisperX
-pip install git+https://github.com/m-bain/whisperx.git
+Follow the official [WhisperX GitHub](https://github.com/m-bain/whisperx) guide.
 
 # Install dependencies
 pip install -r requirements.txt
