@@ -1,7 +1,13 @@
 # TranscriptHub 
-一個企業級的 AI 語音轉錄全端平台，採用 React + Go 作為前端技術，並以 Node.js 作為後端支撐，提供高效能且可擴展的語音轉錄服務。
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![React](https://img.shields.io/badge/React-v18-blue.svg)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-v18-green.svg)](https://nodejs.org/)
+[![Go](https://img.shields.io/badge/Go-v1.20-00ADD8.svg)](https://golang.org/)
+[![WhisperX](https://img.shields.io/badge/WhisperX-AI-orange.svg)](https://github.com/m-bain/whisperX)
 
-An enterprise-grade AI audio transcription platform built with React + Go for the frontend and Node.js for the backend, delivering high-performance and scalable transcription services.
+一個 AI 語音轉錄平台，採用 React + Go 作為前端技術，並以 Node.js 作為後端基礎，提供高品質的語音轉錄服務。
+
+An AI audio transcription platform built with React + Go for the frontend and Node.js for the backend, providing high-quality transcription services.
 
 ---
 
