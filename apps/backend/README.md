@@ -1,272 +1,262 @@
-# Sparrow AI 語音轉錄平台 - 後端服務
+# Academia Sinica Transcription Platform - Backend Service
 
-基於 Node.js 與 WhisperX 的企業級語音轉錄系統後端服務。
+Academia Sinica AI 語音轉錄平台後端服務，基於 Node.js 與 WhisperX 引擎提供高效能語音轉文字處理能力。
 
-## Table of Contents
-- [主要功能](#主要功能)
-- [快速開始](#快速開始)
-- [API 文件](#API-文件)
-- [專案目錄結構](#專案目錄結構)
-- [License](#License)
+Enterprise-grade audio transcription backend service powered by Node.js and WhisperX engine, developed for Academia Sinica.
 
-## 🌟 主要功能
+## 目錄 | Table of Contents
+- [核心功能 | Core Features](#核心功能--core-features)
+- [系統架構 | System Architecture](#系統架構--system-architecture)
+- [安裝指南 | Installation Guide](#安裝指南--installation-guide)
+- [API 文件 | API Documentation](#api-文件--api-documentation)
+- [部署方式 | Deployment](#部署方式--deployment)
+- [專案結構 | Project Structure](#專案結構--project-structure)
+- [授權條款 | License](#授權條款--license)
 
-- 🎯 高效能多工處理架構
-  - Node.js cluster 多核心運算
-  - 自動工作程序管理
-  - 任務狀態即時追蹤
+## 核心功能 | Core Features
 
-- 🔐 企業級安全性
-  - HTTPS 安全連線
-  - SSO 單一登入整合
-  - 檔案存取權限控制
+### 高效能處理引擎 | High-Performance Processing Engine
+- 基於 WhisperX 的最新語音識別技術
+- Node.js cluster 多核心並行處理架構
+- 任務隊列管理與負載平衡機制
 
-- 🎛 彈性輸出格式
-  - 純文字腳本 (TXT)
-  - 字幕檔案 (SRT, VTT)
-  - 結構化資料 (JSON, TSV)
-  - 說話者分離標註
+- State-of-the-art speech recognition with WhisperX
+- Multi-core parallel processing with Node.js cluster
+- Task queue management and load balancing
 
-## 🚀 快速開始
+### 企業級系統設計 | Enterprise System Design
+- 完整的錯誤處理與日誌記錄機制
+- 資料庫持久化儲存與備份機制
+- 服務健康監控與自動恢復功能
 
-### 系統需求
+- Comprehensive error handling and logging
+- Database persistence and backup mechanisms
+- Service health monitoring and auto-recovery
+
+### 多樣化輸出格式 | Diverse Output Formats
+- 標準文字檔案 (TXT)
+- 時間碼字幕檔案 (SRT, VTT)
+- JSON/TSV 結構化資料
+- 多人對話分離標註
+
+- Standard text files (TXT)
+- Timestamped subtitle files (SRT, VTT)
+- Structured data in JSON/TSV format
+- Speaker diarization support
+
+## 系統架構 | System Architecture
+
+本系統採用多層架構設計：
+The system employs a multi-layered architecture:
+
+1. **API 層 | API Layer**：處理 HTTP 請求及回應，提供 RESTful API
+   Handles HTTP requests and responses via RESTful endpoints
+   
+2. **服務層 | Service Layer**：實現核心業務邏輯，處理轉錄任務流程
+   Implements core business logic and transcription workflow
+   
+3. **資料層 | Data Layer**：與 SQL Server 資料庫交互，儲存系統數據
+   Interacts with SQL Server database for data persistence
+   
+4. **轉錄引擎層 | Transcription Engine Layer**：整合 WhisperX Python 處理引擎
+   Integrates with WhisperX Python processing engine
+
+## 安裝指南 | Installation Guide
+
+### 環境需求 | Prerequisites
 - Node.js v18.20.3+
-- Anaconda/Miniconda
+- Python 3.8+ 與 Anaconda/Miniconda | Python 3.8+ with Anaconda/Miniconda
 - SQL Server 2019+
-- CUDA 支援的 GPU (建議)
+- CUDA 支援的 NVIDIA GPU (建議 RTX 系列) | CUDA-compatible NVIDIA GPU (RTX series recommended)
 
-### 安裝步驟
+### 安裝步驟 | Installation Steps
 
-1. **設定 Conda 環境**
+1. **設定 Python 環境 | Set up Python Environment**
 ```bash
-# 建立 conda 環境
+# 建立獨立環境 | Create isolated environment
 conda create -n whisperx python=3.8
-
-# 啟動環境
 conda activate whisperx
 
-# 安裝 WhisperX
-請依官方 GitHub 指引安裝點選[WhisperX GitHub](https://github.com/m-bain/whisperx)可以連結到該專案的頁面。
-
-# 安裝相依套件
+# 安裝 WhisperX 與相關套件 | Install WhisperX and dependencies
+pip install git+https://github.com/m-bain/whisperx.git
 pip install -r requirements.txt
 ```
 
-2. **安裝資料庫**
+2. **設定資料庫 | Set up Database**
 ```bash
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
-   -p 1433:1433 --name sqlserver \
-   -d mcr.microsoft.com/mssql/server:2022-latest
+# 使用 Docker 快速部署 SQL Server | Quick deployment with Docker
+docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword' \
+  -p 1433:1433 --name as-sqlserver \
+  -d mcr.microsoft.com/mssql/server:2019-latest
+
+# 或使用現有的 SQL Server 實例 | Or use existing SQL Server instance
 ```
 
-3. **Clone 專案**
-   ```sh
-   git clone https://github.com/AS-AIGC/TranscriptHub.git
-   cd TranscriptHub/apps/backend/
-   ```
-
-4. **初始化資料庫**
-執行 SQL 腳本：
-- sql/initial.sql
-- sql/task.sql
-- sql/access_operation.sql
-- sql/access_operation_error.sql
-
-5. **設定環境變數**
+3. **複製並配置專案 | Clone and Configure Project**
 ```bash
+# 複製專案 | Clone repository
+git clone https://github.com/AS-AIGC/TranscriptHub.git
+cd TranscriptHub/apps/backend/
+
+# 配置環境變數 | Configure environment variables
 cp .env.example .env
+# 編輯 .env 設定資料庫連接與系統參數 | Edit .env file with database connection and system parameters
+
+# 配置系統設定 | Configure system settings
 cp config.json.example config.json
-# 編輯設定檔內容
+# 編輯 config.json 設定系統路徑與轉錄參數 | Edit config.json with system paths and transcription parameters
 ```
 
-6. **安裝 Node.js 相依套件**
+4. **安裝 Node.js 套件 | Install Node.js Packages**
 ```bash
 npm ci
 ```
 
-7. **啟動服務**
+5. **初始化資料庫 | Initialize Database**
 ```bash
-./run.sh {start|stop|status|restart}
+# 執行資料庫初始化腳本 | Run database initialization script
+node scripts/db-init.js
+# 或手動執行 SQL 目錄中的腳本檔案 | Or manually execute SQL scripts from the sql directory
 ```
 
-### 注意事項
-- 轉錄任務腳本名稱需同步更新：
-  - `scripts/transcribe.py`
-  - `config.js` 中的 `TASK_SCRIPT` 設定
-  - `run.sh` 中的腳本路徑
+6. **啟動服務 | Start Service**
+```bash
+# 使用控制腳本啟動服務 | Use control script to start service
+./run.sh start
 
-## 📚 API 文件
+# 其他指令 | Other commands
+./run.sh stop    # 停止服務 | Stop service
+./run.sh status  # 檢查狀態 | Check status
+./run.sh restart # 重新啟動 | Restart service
+```
 
-### 任務管理
-| 方法 | 路徑 | 說明 |
-|------|------|------|
-| POST | `/api/v1/rest/CreateTranscribeTask` | 建立轉錄任務 |
-| POST | `/api/v1/rest/CancelTask` | 取消執行任務 |
-| POST | `/api/v1/rest/ViewAllTask` | 查看任務狀態 |
-| GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | 下載轉錄結果 |
+## API 文件 | API Documentation
 
+### 認證機制 | Authentication
+系統使用 API Key 認證，需在請求標頭中包含 `X-API-Key` 欄位。
 
-## 🗂 專案目錄結構
+The system uses API Key authentication. Include `X-API-Key` header in your requests.
+
+### 任務管理 API | Task Management API
+
+#### 建立轉錄任務 | Create Transcription Task
+```
+POST /api/v1/rest/CreateTranscribeTask
+Content-Type: multipart/form-data
+
+Parameters:
+- file: 音訊檔案 (必須) | Audio file (required)
+- language: 語言代碼 (選填，預設為 "zh") | Language code (optional, default "zh")
+- formats: 輸出格式，以逗號分隔 (選填，預設為 "txt,srt") | Output formats, comma-separated (optional, default "txt,srt")
+- diarize: 是否進行說話者分離 (選填，預設為 false) | Enable speaker diarization (optional, default false)
+- callback_url: 任務完成後的回調 URL (選填) | Callback URL when task completes (optional)
+```
+
+#### 查詢任務狀態 | Query Task Status
+```
+POST /api/v1/rest/ViewAllTask
+Content-Type: application/json
+
+Body:
+{
+  "task_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" (選填，若不提供則返回所有任務 | optional, returns all tasks if omitted)
+}
+```
+
+#### 取消任務 | Cancel Task
+```
+POST /api/v1/rest/CancelTask
+Content-Type: application/json
+
+Body:
+{
+  "task_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" (必須 | required)
+}
+```
+
+#### 下載轉錄結果 | Download Transcription Results
+```
+GET /api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}
+
+Parameters:
+- FORMAT: 輸出格式 (txt, srt, vtt, json, tsv) | Output format (txt, srt, vtt, json, tsv)
+- filename: 檔案名稱 (不含副檔名) | File name (without extension)
+```
+
+### 錯誤代碼 | Error Codes
+
+| 代碼 Code | 說明 Description |
+|------|-------------|
+| 400  | 請求參數錯誤 Bad Request |
+| 401  | 未授權存取 Unauthorized |
+| 404  | 資源不存在 Resource Not Found |
+| 500  | 伺服器內部錯誤 Internal Server Error |
+
+## 部署方式 | Deployment
+
+### 生產環境建議 | Production Recommendations
+
+1. **使用 PM2 管理進程 | Process Management with PM2**
+```bash
+npm install -g pm2
+pm2 start main.js -i max --name "as-transcribe"
+```
+
+2. **設定 Nginx 反向代理 | Nginx Reverse Proxy Configuration**
+```nginx
+server {
+    listen 443 ssl;
+    server_name transcribe.yourdomain.com;
+
+    # SSL 設定 | SSL configuration
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+3. **配置防火牆與資安設定 | Security Configuration**
+   - 限制訪問 IP | Restrict access by IP
+   - 設定請求速率限制 | Set up request rate limiting
+   - 啟用 HTTPS 強制跳轉 | Enable HTTPS redirect
+
+## 專案結構 | Project Structure
 ```
 apps/backend/
-├── controller/               # 控制器目錄
-├── middlewares/              # 中介軟體目錄
-├── scripts/                  # 腳本目錄
-│   ├── transcribe.py         # 轉錄任務腳本
-├── services/                 # 服務目錄
-├── sql/                      # SQL 腳本目錄
-│   ├── initial.sql           # 初始化資料庫腳本
-│   ├── task.sql              # 任務相關資料庫腳本
-│   ├── access_operation.sql  # 存取操作資料庫腳本
-│   ├── access_operation_error.sql  # 存取操作錯誤資料庫腳本
-├── .env.example              # 環境變數範例檔案
-├── README.md                 # 專案說明文件
-├── config.js                 # 主要設定檔
-├── constants.js              # 常量定義檔
-├── db.js                     # 資料庫設定檔
-├── env.js                    # 環境設定檔
-├── logger-writer.js          # 日誌寫入模組
-├── logger.js                 # 日誌模組
-├── main.js                   # 主程式入口
-├── package-lock.json         # Node.js 鎖定檔案
-├── package.json              # Node.js 專案設定檔
-├── query_constants.js        # 查詢常量定義檔
-├── requirements.txt          # Python 相依套件列表
-├── run.sh                    # 啟動服務腳本
-├── shared.js                 # 共享模組
-├── utils.js                  # 工具函數模組
-```
----
-
-# Sparrow AI Transcription Platform - Backend Service
-
-Enterprise-grade audio transcription backend service based on Node.js and WhisperX.
-
-## 🌟 Key Features
-
-- 🎯 High-Performance Architecture
-  - Multi-core processing with Node.js cluster
-  - Automatic worker process management
-  - Real-time task status tracking
-
-- 🔐 Enterprise Security
-  - HTTPS support
-  - SSO integration
-  - File access control
-
-- 🎛 Flexible Output Formats
-  - Plain text transcripts (TXT)
-  - Subtitle files (SRT, VTT)
-  - Structured data (JSON, TSV)
-  - Speaker diarization
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js v18.20.3+
-- Anaconda/Miniconda
-- SQL Server 2019+
-- CUDA-capable GPU (recommended)
-
-### Installation Steps
-
-1. **Setup Conda Environment**
-```bash
-# Create conda environment
-conda create -n whisperx python=3.8
-
-# Activate environment
-conda activate whisperx
-
-# Install WhisperX
-Follow the official [WhisperX GitHub](https://github.com/m-bain/whisperx) guide.
-
-# Install dependencies
-pip install -r requirements.txt
+├── controller/           # API 控制器目錄 | API controllers directory
+│   ├── auth.js           # 認證控制器 | Authentication controller
+│   ├── task.js           # 任務控制器 | Task controller
+│   └── transcribe.js     # 轉錄控制器 | Transcription controller
+├── middlewares/          # 中間件目錄 | Middleware directory
+│   ├── auth.js           # 認證中間件 | Authentication middleware
+│   ├── error.js          # 錯誤處理中間件 | Error handling middleware
+│   ├── logger.js         # 日誌中間件 | Logging middleware
+│   └── validator.js      # 請求驗證中間件 | Request validation middleware
+├── scripts/              # 腳本目錄 | Scripts directory
+│   ├── transcribe.py     # 轉錄處理主腳本 | Main transcription script
+│   ├── db-init.js        # 資料庫初始化腳本 | Database initialization script
+│   └── utils/            # 工具腳本目錄 | Utility scripts directory
+├── services/             # 服務層目錄 | Services directory
+│   ├── db.js             # 資料庫服務 | Database service
+│   ├── task.js           # 任務服務 | Task service
+│   └── transcribe.js     # 轉錄服務 | Transcription service
+├── sql/                  # SQL 腳本目錄 | SQL scripts directory
+├── .env.example          # 環境變數範例 | Environment variables example
+├── config.js             # 系統配置 | System configuration
+├── constants.js          # 常數定義 | Constants definition
+├── logger.js             # 日誌模組 | Logging module
+├── main.js               # 應用程式入口 | Application entry point
+├── package.json          # 專案描述檔 | Project descriptor
+└── run.sh                # 服務控制腳本 | Service control script
 ```
 
-2. **Setup Database**
-```bash
-docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrong!Passw0rd' \
-   -p 1433:1433 --name sqlserver \
-   -d mcr.microsoft.com/mssql/server:2022-latest
-```
+## 授權條款 | License
 
-3. **Clone the Project**
-   ```sh
-   git clone https://github.com/AS-AIGC/TranscriptHub.git
-   cd TranscriptHub
-   ```
+本專案採用 MIT 授權條款。
 
-4. **Initialize Database**
-Execute SQL scripts:
-- sql/initial.sql
-- sql/task.sql
-- sql/access_operation.sql
-- sql/access_operation_error.sql
-
-5. **Configure Environment**
-```bash
-cp .env.example .env
-cp config.json.example config.json
-# Edit configuration files
-```
-
-6. **Install Node.js Dependencies**
-```bash
-npm ci
-```
-
-7. **Start Service**
-```bash
-./run.sh {start|stop|status|restart}
-```
-
-### Important Notes
-- Transcription script name must be synchronized in:
-  - `scripts/transcribe.py`
-  - `TASK_SCRIPT` setting in `config.js`
-  - Script path in `run.sh`
-
-## 📚 API Documentation
-
-### Task Management
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/api/v1/rest/CreateTranscribeTask` | Create transcription task |
-| POST | `/api/v1/rest/CancelTask` | Cancel running task |
-| POST | `/api/v1/rest/ViewAllTask` | View task status |
-| GET  | `/api/v1/rest/RetrieveTranscribe/{FORMAT}/{filename}` | Download results |
-
-## 🗂 Project Directory Architecture
-```
-apps/backend/
-├── controller/               # Controllers directory
-├── middlewares/              # Middlewares directory
-├── scripts/                  # Scripts directory
-│   ├── transcribe.py         # Transcription task script
-├── services/                 # Services directory
-├── sql/                      # SQL scripts directory
-│   ├── initial.sql           # Initialize database script
-│   ├── task.sql              # Task-related database script
-│   ├── access_operation.sql  # Access operation database script
-│   ├── access_operation_error.sql  # Access operation error database script
-├── .env.example              # Example environment variable file
-├── README.md                 # Project documentation file
-├── config.js                 # Main configuration file
-├── constants.js              # Constants definition file
-├── db.js                     # Database configuration file
-├── env.js                    # Environment configuration file
-├── logger-writer.js          # Logger writer module
-├── logger.js                 # Logger module
-├── main.js                   # Main application entry point
-├── package-lock.json         # Node.js lock file
-├── package.json              # Node.js project configuration file
-├── query_constants.js        # Query constants definition file
-├── requirements.txt          # Python dependencies list
-├── run.sh                    # Service start script
-├── shared.js                 # Shared functions module
-├── utils.js                  # Utilities functions module
-```
-## 📄 License
-MIT License
+This project is licensed under the MIT License.
