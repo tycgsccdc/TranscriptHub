@@ -106,7 +106,6 @@ cp .env.example .env
 # 配置系統設定 | Configure system settings
 cp config.json.example config.json
 # 編輯 config.json 設定系統路徑與轉錄參數 | Edit config.json with system paths and transcription parameters
-const TASK_HOME = process.env.TASK_HOME;
   
 # 建立相關目錄 | Create Required Directories
 TASK_HOME=/data/transcribehub    # 轉錄任務根目錄 | Root directory for transcription tasks
