@@ -360,45 +360,45 @@ server {
 ## 專案結構 | Project Structure
 ```
 apps/backend/
-├── controller/           # API 控制器目錄 | API controllers directory
-│   ├── auth_controller.js    # 認證控制器 | Authentication controller
-│   └── task_controller.js    # 任務控制器 | Task controller
-├── log/                 # 系統日誌目錄 | System logs directory
-├── middlewares/         # 中間件目錄 | Middleware directory
-│   └── validator_params.js   # 請求驗證中間件 | Request validation middleware
-├── scripts/            # 腳本目錄 | Scripts directory
-│   ├── config.json         # 轉錄引擎配置檔 | Transcription engine config
-│   └── transcribe.py       # 轉錄處理主腳本 | Main transcription script
-├── services/           # 服務層目錄 | Services directory
-│   └── task_service.js     # 轉錄服務 | Transcription service
-├── sql/               # SQL 腳本目錄 | SQL scripts directory
+├── controller/                     # API 控制器目錄 | API controllers directory
+│   ├── auth_controller.js          # 認證控制器 | Authentication controller
+│   └── task_controller.js          # 任務控制器 | Task controller
+├── log/                            # 系統日誌目錄 | System logs directory
+├── middlewares/                    # 中間件目錄 | Middleware directory
+│   └── validator_params.js         # 請求驗證中間件 | Request validation middleware
+├── scripts/                        # 腳本目錄 | Scripts directory
+│   ├── config.json                 # 轉錄引擎配置檔 | Transcription engine config
+│   └── transcribe.py               # 轉錄處理主腳本 | Main transcription script
+├── services/                       # 服務層目錄 | Services directory
+│   └── task_service.js             # 轉錄服務 | Transcription service
+├── sql/                            # SQL 腳本目錄 | SQL scripts directory
 │   ├── access_operation_error.sql  # 操作異常資料表 | Operation error table
 │   ├── access_operation.sql        # 操作紀錄資料表 | Operation log table
-│   ├── createdb.sql               # 建立資料庫腳本 | Database creation script
-│   ├── initial.sql                # 系統初始化腳本 | System initialization
-│   └── task.sql                   # 任務資料表腳本 | Task table script
-├── transcribe/         # 轉錄結果目錄 | Transcription results directory
-│   ├── json/               # JSON 格式輸出 | JSON format output
-│   ├── srt/                # SRT 格式輸出 | SRT format output
-│   ├── tsv/                # TSV 格式輸出 | TSV format output
-│   ├── txt/                # TXT 格式輸出 | Text format output
-│   └── vtt/                # VTT 格式輸出 | VTT format output
-├── upload/            # 上傳檔案目錄 | Upload directory
-├── uploadlc/          # 處理後檔案目錄 | Processed files directory
-├── .env.example       # 環境變數範例 | Environment variables example
-├── db-init.js         # 資料庫初始化腳本 | Database initialization script
-├── db.js              # 資料庫連接模組 | Database connection module
-├── config.js          # 系統配置檔 | System configuration
-├── constants.js       # 常數定義檔 | Constants definition
-├── env.js             # 環境變數處理 | Environment variables handler
-├── logger-writter.js  # 日誌寫入器 | Log writer
-├── logger.js          # 日誌模組 | Logging module
-├── main.js            # 應用程式入口 | Application entry point
-├── package.json       # 專案描述檔 | Project descriptor
-├── query_constants.js # 查詢常數檔 | Query constants
-├── run.sh             # 服務控制腳本 | Service control script
-├── shared.js          # 共用函數模組 | Shared functions module
-└── utils.js           # 工具函數模組 | Utility functions module
+│   ├── createdb.sql                # 建立資料庫腳本 | Database creation script
+│   ├── initial.sql                 # 系統初始化腳本 | System initialization
+│   └── task.sql                    # 任務資料表腳本 | Task table script
+├── transcribe/                     # 轉錄結果目錄 | Transcription results directory
+│   ├── json/                       # JSON 格式輸出 | JSON format output
+│   ├── srt/                        # SRT 格式輸出 | SRT format output
+│   ├── tsv/                        # TSV 格式輸出 | TSV format output
+│   ├── txt/                        # TXT 格式輸出 | Text format output
+│   └── vtt/                        # VTT 格式輸出 | VTT format output
+├── upload/                         # 上傳檔案目錄 | Upload directory
+├── uploadlc/                       # 處理後檔案目錄 | Processed files directory
+├── .env.example                    # 環境變數範例 | Environment variables example
+├── db-init.js                      # 資料庫初始化腳本 | Database initialization script
+├── db.js                           # 資料庫連接模組 | Database connection module
+├── config.js                       # 系統配置檔 | System configuration
+├── constants.js                    # 常數定義檔 | Constants definition
+├── env.js                          # 環境變數處理 | Environment variables handler
+├── logger-writter.js               # 日誌寫入器 | Log writer
+├── logger.js                       # 日誌模組 | Logging module
+├── main.js                         # 應用程式入口 | Application entry point
+├── package.json                    # 專案描述檔 | Project descriptor
+├── query_constants.js              # 查詢常數檔 | Query constants
+├── run.sh                          # 服務控制腳本 | Service control script
+├── shared.js                       # 共用函數模組 | Shared functions module
+└── utils.js                        # 工具函數模組 | Utility functions module
 ```
 
 ## 授權條款 | License
