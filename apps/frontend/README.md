@@ -44,21 +44,20 @@ A modern, intuitive frontend interface for the Academia Sinica AI Transcription 
 
 ## 技術架構 | Technical Architecture
 
-本系統採用現代前端技術堆疊：
-The system utilizes a modern frontend technology stack:
+本系統採用以下技術堆疊：
+The system utilizes the following technology stack:
 
-1. **Framework**: React.js 18 with Next.js 13
-2. **UI Library**: Material-UI v5
-3. **State Management**: Redux Toolkit
-4. **API Communication**: Axios with React-Query
-5. **Build Tools**: Webpack 5, Babel
-6. **Testing**: Jest, React Testing Library
+1. **Framework**: Go with custom web server implementation
+2. **Web Server**: sherryserver (custom Go library)
+3. **Templating Engine**: Go templates
+4. **Environment Management**: godotenv
+5. **Audio Processing**: faiface/beep
 
 ## 安裝指南 | Installation Guide
 
 ### 環境需求 | Prerequisites
-- Node.js v18.20.3+
-- npm v9.0.0+ 或 Yarn v1.22.0+ | npm v9.0.0+ or Yarn v1.22.0+
+- Go 1.24.0+
+- GNU Make (for Makefile usage)
 - 現代瀏覽器支援 (Chrome, Firefox, Safari, Edge) | Modern browser support (Chrome, Firefox, Safari, Edge)
 
 ### 安裝步驟 | Installation Steps
@@ -71,31 +70,31 @@ cd TranscriptHub/apps/frontend/
 
 2. **安裝依賴套件 | Install Dependencies**
 ```bash
-npm install
-# 或使用 Yarn | or using Yarn
-yarn install
+go mod download
 ```
 
 3. **配置環境變數 | Configure Environment Variables**
 ```bash
-cp .env.example .env.local
-# 編輯 .env.local 設定 API 端點與其他環境變數 | Edit .env.local with API endpoints and other environment variables
+cp envfile.example envfile
+# 編輯 envfile 設定 API 端點與其他環境變數 | Edit envfile with API endpoints and other environment variables
 ```
 
-4. **開發模式啟動 | Start Development Server**
+4. **使用 Makefile 建置與運行 | Build and Run using Makefile**
 ```bash
-npm run dev
-# 或使用 Yarn | or using Yarn
-yarn dev
+# 建置專案 | Build the project
+make build
+
+# 運行專案 | Run the project
+make run
 ```
 
-5. **建置生產版本 | Build Production Version**
+5. **直接使用 Go 命令 | Directly using Go commands**
 ```bash
-npm run build
-npm run start
-# 或使用 Yarn | or using Yarn
-yarn build
-yarn start
+# 建置專案 | Build the project
+go build -o frontend
+
+# 運行專案 | Run the project
+./frontend
 ```
 
 ## 使用說明 | Usage Guide
@@ -143,78 +142,75 @@ yarn start
 
 ### 代碼風格與規範 | Code Style and Standards
 
-本專案遵循 Airbnb JavaScript Style Guide，並使用 ESLint 與 Prettier 確保代碼一致性：
-This project follows the Airbnb JavaScript Style Guide and uses ESLint and Prettier for code consistency:
+本專案遵循標準 Go 代碼風格，建議使用 gofmt 與 golint 確保代碼一致性：
+This project follows standard Go code style and recommends using gofmt and golint for code consistency:
 
 ```bash
-# 檢查代碼風格 | Check code style
-npm run lint
-
-# 自動修復代碼風格問題 | Auto-fix code style issues
-npm run lint:fix
-
 # 格式化代碼 | Format code
-npm run format
+gofmt -w .
+
+# 檢查代碼風格 | Check code style
+golint ./...
 ```
 
 ### 開發模式 | Development Mode
 
 ```bash
-# 使用熱重載開發模式 | Run development server with hot-reloading
-npm run dev
+# 直接運行 | Run directly
+go run *.go
 
-# 使用指定 port | Use specific port
-npm run dev -- -p 3001
-```
-
-### 測試 | Testing
-
-```bash
-# 執行單元測試 | Run unit tests
-npm run test
-
-# 執行覆蓋率測試 | Run coverage tests
-npm run test:coverage
-
-# 執行 E2E 測試 | Run E2E tests
-npm run test:e2e
+# 使用熱重載工具如 Air 進行開發 | Use hot-reload tools like Air for development
+air
 ```
 
 ### 建置與部署 | Building and Deployment
 
 ```bash
-# 生產環境建置 | Production build
-npm run build
+# 在本機建置 | Local build
+go build -o frontend
 
-# 本地預覽生產版本 | Local preview of production build
-npm run start
+# 使用 Makefile | Using Makefile
+make build
 
-# 靜態輸出 (如需部署到靜態託管服務) | Static export (for deployment to static hosting)
-npm run export
+# Docker 建置與運行 | Docker build and run
+docker build -t transcripthub-frontend .
+docker run -p 8080:80 transcripthub-frontend
 ```
 
 ## 專案結構 | Project Structure
 ```
 apps/frontend/
-├── public/              # 靜態資源 | Static assets
-├── src/
-│   ├── api/             # API 請求封裝 | API request wrappers
-│   ├── components/      # UI 組件 | UI components
-│   │   ├── common/      # 通用組件 | Common components
-│   │   ├── forms/       # 表單組件 | Form components
-│   │   ├── layout/      # 佈局組件 | Layout components
-│   │   └── ...
-│   ├── context/         # React Context
-│   ├── hooks/           # 自定義 Hooks | Custom Hooks
-│   ├── pages/           # 頁面組件 | Page components
-│   ├── redux/           # Redux 狀態管理 | Redux state management
-│   ├── styles/          # 全局樣式 | Global styles
-│   ├── types/           # TypeScript 類型定義 | TypeScript type definitions
-│   └── utils/           # 工具函數 | Utility functions
-├── .env.example         # 環境變數範例 | Environment variables example
-├── next.config.js       # Next.js 配置 | Next.js configuration
-├── package.json         # 專案描述檔 | Project descriptor
-└── tsconfig.json        # TypeScript 配置 | TypeScript configuration
+├── Dockerfile           # Docker 配置 | Docker configuration
+├── README.md            # 專案說明文檔 | Project documentation
+├── afterupload.go       # 上傳後處理邏輯 | Post-upload processing logic
+├── countlength.go       # 文件長度計算功能 | File length calculation
+├── download.go          # 下載功能處理 | Download handling
+├── envfile              # 環境變數配置 | Environment variable configuration
+├── go.mod               # Go 模組定義 | Go module definition
+├── go.sum               # Go 依賴版本鎖定 | Go dependency version lock
+├── homepage.go          # 首頁處理邏輯 | Homepage handling logic
+├── jobdone.go           # 任務完成相關功能 | Task completion functionality
+├── jobs.go              # 任務管理相關功能 | Job management functionality
+├── makefile             # 自動化建置腳本 | Build automation scripts
+├── page.go              # 頁面處理共用邏輯 | Common page handling logic
+├── queryjobs.go         # 任務查詢功能 | Job query functionality
+├── router.go            # 路由處理 | Routing handler
+├── sendmail.go          # 郵件發送功能 | Email sending functionality
+├── server.go            # 伺服器主程式 | Server main program
+├── upload.go            # 檔案上傳處理 | File upload handling
+├── userinf.go           # 使用者資訊相關 | User information related
+├── writefile.go         # 檔案寫入功能 | File writing functionality
+├── tmp/                 # 臨時檔案目錄 | Temporary files directory
+│   └── joblists         # 任務列表存儲 | Job list storage
+└── www/                 # 靜態資源與模板 | Static assets and templates
+    ├── html/            # HTML 靜態資源 | HTML static assets
+    │   ├── css/         # CSS 樣式表 | CSS stylesheets
+    │   ├── images/      # 圖片資源 | Image resources
+    │   └── ...
+    └── template/        # Go HTML 模板 | Go HTML templates
+        ├── index.tpl    # 主頁模板 | Homepage template
+        ├── sidebar.tpl  # 側邊欄模板 | Sidebar template
+        └── ...
 ```
 
 ## 授權條款 | License
