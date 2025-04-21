@@ -77,9 +77,8 @@ The system employs a multi-layered architecture:
 conda create -n whisperx python=3.8
 conda activate whisperx
 
-# 安裝 WhisperX 與相關套件 | Install WhisperX and dependencies
+# 安裝 WhisperX | Install WhisperX
 pip install git+https://github.com/m-bain/whisperx.git
-pip install -r requirements.txt
 ```
 
 2. **設定資料庫 | Set up Database**
@@ -105,6 +104,10 @@ cp .env.example .env
 # 配置系統設定 | Configure system settings
 cp config.json.example config.json
 # 編輯 config.json 設定系統路徑與轉錄參數 | Edit config.json with system paths and transcription parameters
+
+
+# 安裝專案 scripts 的相關套件 | Install dependencies for project scripts
+pip install -r scripts/requirements.txt
 ```
 
 4. **安裝 Node.js 套件 | Install Node.js Packages**
@@ -115,8 +118,14 @@ npm ci
 5. **初始化資料庫 | Initialize Database**
 ```bash
 # 執行資料庫初始化腳本 | Run database initialization script
-node scripts/db-init.js
-# 或手動執行 SQL 目錄中的腳本檔案 | Or manually execute SQL scripts from the sql directory
+node db-init.js
+# 或執行下列 SQL 腳本 (請依照實際資料庫設定修改連線資訊) | Or execute SQL scripts (modify connection settings accordingly)
+cd sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i createdb.sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i initial.sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i access_operation.sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i access_operation_error.sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i task.sql
 ```
 
 6. **啟動服務 | Start Service**
