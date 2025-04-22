@@ -80,31 +80,25 @@ Frontend (React + Go) ←→ API Gateway ←→ Backend (Node.js)
 ## 📁 專案結構 | Project Structure
 ```
 TranscriptHub/
-└── apps/
-    ├── frontend/                 # 前端應用 | Frontend application
-    │   ├── web/                 # React 應用 | React application
-    │   │   ├── public/          # 靜態資源 | Static assets
-    │   │   ├── src/             # React 源碼 | React source
-    │   │   │   ├── components/  # UI 元件 | UI components
-    │   │   │   ├── hooks/       # React Hooks
-    │   │   │   ├── pages/       # 頁面元件 | Page components
-    │   │   │   ├── services/    # API 服務 | API services
-    │   │   │   └── utils/       # 工具函數 | Utilities
-    │   │   └── package.json     # 前端相依套件 | Frontend dependencies
-    │   │
-    │   └── server/              # Go 應用 | Go application
-    │       ├── cmd/             # 主程式進入點 | Entry points
-    │       ├── internal/        # 內部套件 | Private packages
-    │       ├── pkg/             # 公用套件 | Public packages
-    │       └── go.mod           # Go 相依套件 | Go dependencies
-    │
-    └── backend/                 # 後端服務 | Backend service
-       ├── controller/           # 控制器 | Controllers
-       ├── middlewares/         # 中介軟體 | Middlewares
-       ├── scripts/             # 轉錄腳本 | Transcription scripts
-       ├── services/            # 服務層 | Services
-       ├── sql/                 # 資料庫腳本 | Database scripts
-       └── package.json         # 後端相依套件 | Backend dependencies
+├── apps/
+│   ├── frontend/                  # 前端應用目錄 | Frontend Application Directory
+│   │   ├── Dockerfile             # Docker 配置 | Docker configuration
+│   │   ├── www/                   # 靜態資源與模板 | Static assets and templates
+│   │   ├── tmp/                   # 臨時檔案目錄 | Temporary files directory
+│   │   ├── server.go              # 伺服器主程式 | Server main program
+│   │   ├── router.go              # 路由處理 | Routing handler
+│   │   └── ...                    # 其他前端檔案 | Other frontend files
+│   └── backend/                   # 後端服務目錄 | Backend Service Directory
+│       ├── controller/            # API 控制器 | API controllers
+│       ├── services/              # 服務層 | Services layer
+│       ├── sql/                   # SQL 腳本 | SQL scripts
+│       ├── scripts/               # 轉錄腳本 | Transcription scripts
+│       ├── transcribe/            # 轉錄輸出 | Transcription outputs
+│       ├── upload/                # 檔案上傳目錄 | Upload directory
+│       ├── main.js                # 應用程式入口 | Entry point
+│       └── ...                    # 其他後端檔案 | Other backend files
+│── doc/                           # 文件目錄 | Documentation directory
+└── image/                         # 圖片目錄 | Image directory
 ```
 
 ---
