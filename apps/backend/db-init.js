@@ -1,5 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
+const cfg = require('./config.js');
+
 const sql = require('mssql');
 
 require('dotenv').config();
@@ -22,17 +24,8 @@ async function execute_sql_file(pool, file_path) {
 }
 
 async function initialize_database() {
-  const config = {
-    server: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    options: {
-      trustServerCertificate: true
-    }
-  };
-
   try {
-    const pool = await sql.connect(config);
+    const pool = await sql.connect(cfg.sql_config);
     
     // Create database if it doesn't exist
     await pool.request().query(
@@ -46,8 +39,7 @@ async function initialize_database() {
     
     // Read SQL files from sql directory
     const sql_dir = path.join(__dirname, 'sql');
-    const files = await fs.readdir(sql_dir);
-    
+      
     // Define the specific order of files
     const file_order = [
       'createdb.sql',

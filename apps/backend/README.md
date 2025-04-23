@@ -71,19 +71,7 @@ The system employs a multi-layered architecture:
 
 ### 安裝步驟 | Installation Steps
 
-1. **設定 Python 環境 | Set up Python Environment**
-```bash
-# 建立獨立環境 | Create isolated environment
-conda create -n whisperx python=3.8
-conda activate whisperx
-
-# 安裝 WhisperX | Install WhisperX
-pip install git+https://github.com/m-bain/whisperx.git
-
-參考：[WhisperX GitHub](https://github.com/m-bain/whisperx)
-```
-
-2. **設定資料庫 | Set up Database**
+1. **設定資料庫 | Set up Database**
 ```bash
 # 使用 Docker 快速部署 SQL Server | Quick deployment with Docker
 docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword' \
@@ -92,6 +80,13 @@ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword' \
 
 # 或使用現有的 SQL Server 實例 | Or use existing SQL Server instance
 ```
+
+2. **安裝 WhisperX | Install WhisperX**
+```bash
+# 請參考 [WhisperX GitHub](https://github.com/m-bain/whisperx) 的最新安裝指示。
+Please refer to [WhisperX GitHub](https://github.com/m-bain/whisperx) for the latest installation instructions.
+```
+
 
 3. **複製並配置專案 | Clone and Configure Project**
 ```bash
@@ -108,9 +103,9 @@ cp config.json.example config.json
 # 編輯 config.json 設定系統路徑與轉錄參數 | Edit config.json with system paths and transcription parameters
   
 # 建立相關目錄 | Create Required Directories
-TASK_HOME=/data/transcribehub    # 轉錄任務根目錄 | Root directory for transcription tasks
+TASK_HOME=/data/transcribehub    # 專案根目錄 | Root directory for transcription tasks
+# ⚠️ 請確認此值與 .env 檔案內的 TASK_HOME 相同，避免路徑不一致導致檔案讀寫錯誤。 | ⚠️ Make sure this value matches the TASK_HOME in .env to avoid file path inconsistencies.
 
-# 依照 .env 中定義的 TASK_HOME 建立各目錄 | Create directories based on TASK_HOME defined in .env
 mkdir -p ${TASK_HOME}/upload            # 存放上傳檔案 | For uploaded files
 mkdir -p ${TASK_HOME}/uploadlc          # 存放處理後的上傳檔案 | For processed uploads
 mkdir -p ${TASK_HOME}/transcribe/txt    # 存放文字輸出 | For text output
