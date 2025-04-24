@@ -188,7 +188,7 @@ apps/frontend/
 ├── afterupload.go       # 上傳後處理邏輯 | Post-upload processing logic
 ├── countlength.go       # 文件長度計算功能 | File length calculation
 ├── download.go          # 下載功能處理 | Download handling
-├── envfile              # 環境變數配置 | Environment variable configuration
+├── envfile.example      # 環境變數配置範例 | Environment variable configuration example
 ├── go.mod               # Go 模組定義 | Go module definition
 ├── go.sum               # Go 依賴版本鎖定 | Go dependency version lock
 ├── homepage.go          # 首頁處理邏輯 | Homepage handling logic
