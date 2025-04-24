@@ -43,7 +43,6 @@ async function initialize_database() {
       
     // Define the specific order of files
     const file_order = [
-      'createdb.sql',
       'access_operation.sql',
       'access_operation_error.sql',
       'initial.sql',

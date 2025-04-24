@@ -1,2 +1,2 @@
 -- Create the AI_AP database
--- CREATE DATABASE AI_AP;
+CREATE DATABASE AI_AP;
