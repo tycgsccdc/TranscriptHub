@@ -30,10 +30,10 @@ log:
 
 run: docker
 	docker run -d --restart=always --name ${ContainerName} \
+	--network=host \
 	-v ${CURDIR}www:/app/www  \
 	-v ${CURDIR}envfile:/app/envfile  \
 	-v ${CURDIR}tmp:/app/tmp  \
-	-p ${PORT}:80 \
 	--env-file ${CURDIR}envfile \
 	${ImageName}:${version}
 
