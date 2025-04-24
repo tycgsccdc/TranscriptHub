@@ -1,4 +1,5 @@
-const fs = require('fs').promises;
+const fs_promise = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 const cfg = require('./config.js');
 
@@ -8,7 +9,7 @@ require('dotenv').config();
 
 async function execute_sql_file(pool, file_path) {
   try {
-    const content = await fs.readFile(file_path, 'utf8');
+    const content = await fs_promise.readFile(file_path, 'utf8');
     const statements = content.split('GO').filter(stmt => stmt.trim());
     
     for (const statement of statements) {
@@ -43,9 +44,9 @@ async function initialize_database() {
     // Define the specific order of files
     const file_order = [
       'createdb.sql',
+      'access_operation.sql',
+      'access_operation_error.sql',
       'initial.sql',
-      'acces_operation.sql',
-      'access_opration_error.sql',
       'task.sql'
     ];
 
