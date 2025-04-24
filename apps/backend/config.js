@@ -72,12 +72,12 @@ const http_server = {
 
 // Supported MIME types
 const media_mime_types = [
-  'video/mp4', 
-  'video/mpeg', 
-  'video/m4a',
-  'audio/mpeg', 
-  'audio/wav', 
-  'audio/mp3',
+  'video/mp4',
+  'video/mpeg',
+  'audio/mp4', // m4a
+  'audio/mpeg', // mp3
+  'audio/wav',
+  'audio/wave',
   'application/octet-stream'
 ];
 
