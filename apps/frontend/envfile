@@ -29,4 +29,4 @@ TokenUrl=https://fisa.test.sinica.edu.tw/index.php/sso2/access_token
 UserUrl=https://fisa.test.sinica.edu.tw/index.php/sso2/basic
 JwtKey=justgps@gmail.com
 
-MaxUploadSize=290  #MB
+MaxUploadSize=290
