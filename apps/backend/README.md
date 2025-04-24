@@ -65,7 +65,7 @@ The system employs a multi-layered architecture:
 
 ### 環境需求 | Prerequisites
 - Node.js v18.20.3+
-- Python 3.8+ 與 Anaconda/Miniconda | Python 3.8+ with Anaconda/Miniconda
+- Python 3.9+ 與 Anaconda/Miniconda | Python 3.9+ with Anaconda/Miniconda
 - SQL Server 2019+
 - CUDA 支援的 NVIDIA GPU (建議 RTX 系列) | CUDA-compatible NVIDIA GPU (RTX series recommended)
 
@@ -80,6 +80,8 @@ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword' \
 
 # 或使用現有的 SQL Server 實例 | Or use existing SQL Server instance
 ```
+> [!TIP]  
+> SQLServer 2019 docker manual: https://learn.microsoft.com/zh-tw/sql/linux/quickstart-install-connect-docker
 
 2. **安裝 WhisperX | Install WhisperX**
 ```bash
@@ -99,7 +101,7 @@ cp .env.example .env
 # 編輯 .env 設定資料庫連接與系統參數 | Edit .env file with database connection and system parameters
 
 # 配置系統設定 | Configure system settings
-cp config.json.example config.json
+cp scripts/config.json.example scripts/config.json
 # 編輯 config.json 設定系統路徑與轉錄參數 | Edit config.json with system paths and transcription parameters
   
 # 建立相關目錄 | Create Required Directories
@@ -121,7 +123,7 @@ pip install -r scripts/requirements.txt
 
 4. **安裝 Node.js 套件 | Install Node.js Packages**
 ```bash
-npm ci
+npm install
 ```
 
 5. **初始化資料庫 | Initialize Database**
@@ -131,9 +133,9 @@ node db-init.js
 # 或執行下列 SQL 腳本 (請依照實際資料庫設定修改連線資訊) | Or execute SQL scripts (modify connection settings accordingly)
 cd sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i createdb.sql
-sqlcmd -S localhost -U sa -P YourStrongPassword -i initial.sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i access_operation.sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i access_operation_error.sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i initial.sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i task.sql
 ```
 
