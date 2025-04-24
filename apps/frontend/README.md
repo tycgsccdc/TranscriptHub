@@ -88,6 +88,9 @@ make build
 make run
 ```
 
+> [!IMPORTANT]  
+> This makefile use `--network=host` to make frontend reachable on the same server, remember to modify `envfile` `PORT` if you have service that use 80 port.
+
 5. **直接使用 Go 命令 | Directly using Go commands**
 ```bash
 # 建置專案 | Build the project
