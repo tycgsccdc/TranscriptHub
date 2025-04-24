@@ -363,7 +363,7 @@ apps/backend/
 ├── middlewares/                    # 中間件目錄 | Middleware directory
 │   └── validator_params.js         # 請求驗證中間件 | Request validation middleware
 ├── scripts/                        # 腳本目錄 | Scripts directory
-│   ├── config.json                 # 轉錄引擎配置檔 | Transcription engine config
+│   ├── config.example.json         # 轉錄引擎配置檔範例 | Transcription engine config example
 │   └── transcribe.py               # 轉錄處理主腳本 | Main transcription script
 ├── services/                       # 服務層目錄 | Services directory
 │   └── task_service.js             # 轉錄服務 | Transcription service
