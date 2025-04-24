@@ -11,7 +11,6 @@ PID_FILE="master.pid"
 
 NODEJS_BIN=$(which node)
 NODEJS_APP="./main.js"
-PYTHON_BIN=$(which python)
 PYTHON_SCRIPT="${TASK_HOME}/scripts"
 WHISPERX_TASK="exec_whisperx_task_v1.0.py"
 LOG_DIR="${TASK_HOME}/log"
