@@ -89,7 +89,7 @@ make run
 ```
 
 > [!IMPORTANT]  
-> This makefile use `--network=host` to make frontend reachable on the same server, remember to modify `envfile` `PORT` if you have service that use 80 port.
+> If you host your frontend and backend on the same server, start the server by `make run-same-host`, and set your backend host as `host.docker.internal`
 
 5. **直接使用 Go 命令 | Directly using Go commands**
 ```bash
