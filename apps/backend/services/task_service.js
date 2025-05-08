@@ -245,7 +245,7 @@ async function cleanup_task() {
       query_cleanup_task += `AND (PID IS NULL OR PID NOT IN (${pids_for_query}))`;
     }
   } else {
-    return logger(LOG_LEVEL.ERROR, `cleanup_task pids_for_query ${pids_for_query} is empty.`, memo);
+    return logger(LOG_LEVEL.ERROR, `cleanup_task pids_for_query ${pids_for_query} is empty.`);
   }
 
   const memo = operation_memo({});
