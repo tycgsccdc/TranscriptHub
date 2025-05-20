@@ -1,7 +1,7 @@
 SystemName=JobRunner
 PORT=80
 ContainerName=aisuite
-OriginAllowList=https://taide.its.sinica.edu.tw;http://taide.its.sinica.edu.tw;https://devtaide.test5.sinica.edu.tw/
+OriginAllowList=https://<your IP>;http://<your another IP>
 AllowMethods=POST;GET;PUT;DELETE
 ResponseType=code
 
@@ -18,11 +18,10 @@ smtpPassword=
 NGROK_AUTHTOKEN=
 RAGUrl=
 
-TranslateEndpoint=https://10.109.190.11:8080/api/v1/rest/
-TranslateUrl=https://10.109.190.11:8080/api/v1/rest/CreateTranscribeTask
-TranslateQueryUrl=https://10.109.190.11:8080/api/v1/rest/ViewAllTask
-
-DownloadServer=https://172.18.124.200:8080/api/v1/rest/RetrieveTranscribe/
+TranslateEndpoint=https://<backend安裝的IP位置>/api/v1/rest/
+TranslateUrl=https://<backend安裝的IP位置>/api/v1/rest/CreateTranscribeTask
+TranslateQueryUrl=https://<backend安裝的IP位置>/api/v1/rest/ViewAllTask
+DownloadServer=https://<backend安裝的IP位置>/api/v1/rest/RetrieveTranscribe/
 
 Scope=basic
 TokenUrl=https://fisa.test.sinica.edu.tw/index.php/sso2/access_token
