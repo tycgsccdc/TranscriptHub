@@ -139,8 +139,17 @@ if (cluster.isMaster) {
     logger(LOG_LEVEL.INFO, `Process ${process.pid} handling request: ${req.method} ${req.originalUrl}`);
     next();
   });
-  
-  app.use(cors());
+    
+  // --- 在這裡添加或修改 CORS 設定 ---
+  const corsOptions = {
+    origin: 'http://172.18.92.253', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], 
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'], 
+    credentials: true 
+  };
+
+  app.use(cors(corsOptions)); // <<<<<<----- 用這一行替換掉原來的 app.use(cors());
+  // app.use(cors());
   
   // Configure file upload location and set the upload mechanism to diskStorage
   const uploaded_files_path = multer.diskStorage({

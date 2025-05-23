@@ -5,6 +5,7 @@ import(
    "fmt"
    "io/ioutil"
    "encoding/json"
+   "log" // <--- 加入這一行
    "github.com/asccclass/sherrytime"
 )
 
@@ -87,40 +88,54 @@ func ReadJobsViaTaskID(taskID string)(Job, error) {
 }
 
 /*
-finish: '10',    <--轉檔完成
+finish: '2',    <--轉檔完成
   pending: '5', <---建好objid後
   canceled: '1'
   error: '0'
 */
 
 // 更新 jobs 狀態（翻譯完成，觸發）
-func UpdateJobsViaTaskID(msg ReturnMessage)(error) {
+// jobs.go - UpdateJobsViaTaskID 函數內部
+func UpdateJobsViaTaskID(msg ReturnMessage) error { // msg 現在包含 FileName
+   log.Printf("DEBUG: UpdateJobsViaTaskID received: %+v", msg) // <-- 增加日誌查看收到的完整 msg
    foundz := false
    for idx, job := range Joblistz {
-      if job.TaskID == msg.TaskID {
-         st := sherrytime.NewSherryTime("Asia/Taipei", "-")  // Initial
-         Joblistz[idx].Results = msg.Results
-         Joblistz[idx].FinishTime = st.Now()
-	 if msg.Status == 10 {
-	    Joblistz[idx].Status = "Done"
-	    NeedSave = true
-	    go SendEmailNotify(msg.TaskID, msg.Status)
-         } else if msg.Status == 5 {
-	    Joblistz[idx].Status = "Queue"
-	    NeedSave = true
-         } else if msg.Status == 1 {
-	    Joblistz[idx].Status = "Canceled"
-	    go SendEmailNotify(msg.TaskID, msg.Status)
-	 } else if msg.Status == 0 {
-	    Joblistz[idx].Status = "Error"
-	    go SendEmailNotify(msg.TaskID, msg.Status)
-	 }
-	 foundz = true
-	 break
-      }
+       if job.TaskID == msg.TaskID { // <-- 比對 TaskID
+           st := sherrytime.NewSherryTime("Asia/Taipei", "-")
+           Joblistz[idx].Results = msg.Results
+           Joblistz[idx].FinishTime = st.Now()
+           // *** 新增：更新 FileName ***
+           if msg.FileName != "" { // 只有當通知包含有效的 FileName 時才更新
+               Joblistz[idx].FileName = msg.FileName
+               log.Printf("DEBUG: Updated FileName for TaskID %s to %s", msg.TaskID, msg.FileName)
+           } else {
+                log.Printf("WARN: Received notification for TaskID %s without FileName.", msg.TaskID)
+           }
+           // *** 結束：更新 FileName ***
+
+           if msg.Status == 2 { // 使用正確的完成狀態碼 2
+              Joblistz[idx].Status = "Done"
+              NeedSave = true
+              go SendEmailNotify(msg.TaskID, msg.Status)
+           } else if msg.Status == 5 {
+              Joblistz[idx].Status = "Queue"
+              NeedSave = true
+           } else if msg.Status == 1 {
+              Joblistz[idx].Status = "Canceled"
+              go SendEmailNotify(msg.TaskID, msg.Status)
+           } else if msg.Status == 0 {
+              Joblistz[idx].Status = "Error"
+              go SendEmailNotify(msg.TaskID, msg.Status)
+           } else {
+               log.Printf("WARN: UpdateJobsViaTaskID received unknown status code %d for TaskID %s", msg.Status, msg.TaskID)
+           }
+           foundz = true
+           log.Printf("INFO: Updated job in memory: %+v", Joblistz[idx]) // 打印更新後的 job 狀態
+           break
+       }
    }
    if !foundz {
-      return fmt.Errorf("No job id:" + msg.TaskID)
+       return fmt.Errorf("No job id:" + msg.TaskID)
    }
    return nil
 }

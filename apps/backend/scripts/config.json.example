@@ -13,6 +13,9 @@
   // Processing Parameters
   "batch_size": 4,              // Number of parallel processes
   "chunk_size": 10,             // Audio chunk size in seconds
+  
+  // Hugging Face Configuration
+  "hf_token": "your_token_here", // Hugging Face API token
 
   // Runtime Options
   "print_progress": false,       // Enable progress logging

@@ -1,4 +1,14 @@
-# TranscriptHub 
+# fork TranscriptHub 試用
+#### 調整程式讓他可以執行
+#### 調整sql init順序等等
+
+
+# 運行裝置
+CPU i7-7700K<br>
+ram 32G<br>
+GPU 1080 8G<br>
+
+
 [![Academia Sinica](https://img.shields.io/badge/Academia%20Sinica-%23006E99.svg)](https://www.sinica.edu.tw)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-v18-blue.svg)](https://reactjs.org/)

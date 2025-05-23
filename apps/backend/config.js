@@ -5,8 +5,7 @@ require('dotenv').config();
 const sql_config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER || 'localhost',
-  port: parseInt(process.env.DB_PORT || '1433'),
+  server: process.env.DB_SERVER,
   database: process.env.DB_NAME,
   options: {
     encrypt: false, // Enable encryption if needed
@@ -73,12 +72,12 @@ const http_server = {
 
 // Supported MIME types
 const media_mime_types = [
-  'video/mp4',
-  'video/mpeg',
-  'audio/mp4', // m4a
-  'audio/mpeg', // mp3
-  'audio/wav',
-  'audio/wave',
+  'video/mp4', 
+  'video/mpeg', 
+  'video/m4a',
+  'audio/mpeg', 
+  'audio/wav', 
+  'audio/mp3',
   'application/octet-stream'
 ];
 

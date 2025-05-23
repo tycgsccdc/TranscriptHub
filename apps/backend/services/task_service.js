@@ -2,6 +2,7 @@ const sql = require('mssql');
 const { exec } = require('child_process');
 const fs = require('fs')
 const path = require('path');
+const axios = require('axios'); // <--- 加入這一行
 
 const cfg = require('../config.js');
 const { logger } = require('../logger.js');
@@ -220,55 +221,112 @@ async function cancel_task(data) {
  * @note Different behavior in test vs production mode
  * @note Logs cleanup count on success
  */
+/**
+ * @brief Clean up abandoned or stale tasks in the system
+ *
+ * @note No input parameters - uses global worker PIDs
+ * @return void - Logs results or errors
+ *
+ * Operation Flow:
+ * 1. Get active worker PIDs
+ * 2. Build SQL query with PID filter
+ * 3. Clean tasks that are:
+ *    - Not finished (FINISH_AT IS NULL)
+ *    - Not owned by active workers (unless no PIDs provided)
+ *    - In status NEW(0), RUNNING(1), or RETRY(-3)
+ *
+ * SQL Table Parameter:
+ * - In test mode: Uses table-valued parameter for PIDs
+ * - In prod mode: Uses comma-separated PID list
+ *
+ * @note Requires worker PIDs to be initialized
+ * @note Different behavior in test vs production mode
+ * @note Logs cleanup count on success
+ */
 async function cleanup_task() {
-  let query_cleanup_task = TASK_QUERIES.CLEANUP_TASK;
-  let pids_for_query = get_worker_pids().join(',');
+  // 獲取基礎的 UPDATE 查詢語句
+  let query_cleanup_task = TASK_QUERIES.CLEANUP_TASK; // Example: "UPDATE TASK SET STATUS = -2, PID = @pid, RETRY = RETRY - 1 WHERE STATUS IN (0, 1, -3) AND FINISH_AT IS NULL"
+
+  // 獲取當前活躍的 worker PIDs，並轉換為逗號分隔的字串
+  let pids_for_query_string = get_worker_pids().join(',');
+  const memo = operation_memo({}); // 初始化 memo 對象
+
+  let table; // 用於測試模式的 table-valued parameter
+
+  // 檢查是否有活躍的 worker PIDs
+  let has_active_pids = false;
 
   if (__MSSQL_TEST__) {
-    pids_for_query = get_worker_pids()
-      .join(',')
-      .split(',')
-      .map(id => parseInt(id, 10))
-      .filter(Number.isFinite);
-    logger(LOG_LEVEL.INFO, 'pids_for_query: ' + pids_for_query);
+    // --- 測試模式處理 ---
+    const pids_array = get_worker_pids()
+      .map(id => parseInt(id, 10)) // 確保是數字
+      .filter(Number.isFinite); // 過濾掉非數字
 
-    // TODO: self-defined table is SQL Server CREATE TYPE IntList AS TABLE (value INT);
-    const table = new sql.Table();
+    logger(LOG_LEVEL.INFO, 'cleanup_task pids (test mode): ' + pids_array.join(','));
+
+    table = new sql.Table(); // 假設 IntList 類型已在 SQL Server 中定義
     table.columns.add('value', sql.Int);
-    pids_for_query.forEach(pid => table.rows.add(pid));
-  }
-
-  if (pids_for_query.length > 0) {
-    if (__MSSQL_TEST__) {
-      query_cleanup_task += 'AND (PID IS NULL OR PID NOT IN (SELECT value FROM @pids))';
+    if (pids_array.length > 0) {
+        pids_array.forEach(pid => table.rows.add(pid));
+        query_cleanup_task += ' AND (PID IS NULL OR PID NOT IN (SELECT value FROM @pids))';
+        has_active_pids = true;
     } else {
-      query_cleanup_task += `AND (PID IS NULL OR PID NOT IN (${pids_for_query}))`;
+        // 測試模式下如果沒有 PID，可以選擇不添加 NOT IN 條件，清理所有符合狀態的任務
+        // 或者添加一個永遠為真的條件？ 這裡選擇不添加，讓基礎查詢執行
+        logger(LOG_LEVEL.WARN, 'cleanup_task (test mode): No active PIDs found. Cleanup might affect all eligible tasks.');
     }
+    // --- 測試模式結束 ---
   } else {
-    return logger(LOG_LEVEL.ERROR, `cleanup_task pids_for_query ${pids_for_query} is empty.`);
+    // --- 生產模式處理 ---
+    if (pids_for_query_string.length > 0) {
+      // 這裡需要確保 pids_for_query_string 是安全的，只包含數字和逗號
+      // 實際生產中可能需要更嚴格的驗證來防止 SQL Injection
+      // 假設 get_worker_pids() 返回的是可靠的數字 PID 陣列
+      query_cleanup_task += ` AND (PID IS NULL OR PID NOT IN (${pids_for_query_string}))`;
+      has_active_pids = true;
+    } else {
+      // 生產模式下如果沒有 PID，通常意味著沒有活躍的 worker，可能不需要執行清理
+      // 或者執行基礎查詢清理所有未完成的？ 這裡選擇記錄警告並可能跳過
+      logger(LOG_LEVEL.WARN, `cleanup_task: No active worker PIDs found (pids_for_query is empty). Skipping PID-based exclusion.`);
+      // 如果確定沒 PID 就完全不清理，可以在這裡 return
+      // return;
+    }
+    // --- 生產模式結束 ---
   }
 
-  const memo = operation_memo({});
+  // 執行資料庫操作
   try {
     const pool = await pool_promise;
     const request = pool.request();
-    if (__MSSQL_TEST__) {
-      request
-      .input('pid', sql.Int, process.pid)
-      .input('pids', table);
-    } else {
-      request
-      .input('pid', sql.Int, process.pid);
+
+    // --- 關鍵：為 SET PID = @pid 提供參數值 ---
+    // 使用當前執行 cleanup_task 的這個進程的 PID
+    request.input('pid', sql.Int, process.pid);
+    // -----------------------------------------
+
+    // 如果是測試模式且有 PIDs，綁定 table-valued 參數
+    if (__MSSQL_TEST__ && has_active_pids) {
+      request.input('pids', table);
     }
+
+    // Log the final query for debugging
+    //logger(LOG_LEVEL.DEBUG, `Executing cleanup query: ${query_cleanup_task}`);
     const result = await request.query(query_cleanup_task);
-      
-    if (result.rowsAffected[0] > 0) {
+
+    // 記錄清理結果
+    if (result.rowsAffected && result.rowsAffected.length > 0 && result.rowsAffected[0] > 0) {
       logger(LOG_LEVEL.INFO, `cleanup_task clean up ${result.rowsAffected[0]} records.`, memo);
-    } 
+    } else {
+      // logger(LOG_LEVEL.INFO, `cleanup_task: No records needed cleaning based on current criteria.`, memo);
+    }
   } catch (err) {
-    logger(LOG_LEVEL.ERROR, `cleanup_task ${err}.`, memo);
+    // 記錄執行清理查詢時發生的錯誤
+    logger(LOG_LEVEL.ERROR, `cleanup_task execution failed: ${err}. Query attempted: ${query_cleanup_task}`, memo);
+    // 這裡不需要再嘗試記錄到數據庫，避免循環錯誤
   }
-}      
+}
+
+
 
 /**
  * @brief Query current status of a transcription task
@@ -416,37 +474,139 @@ async function cleanup_task_() {
  * @note Uses different SQL queries based on status
  * @note Logs status change with task ID
  */
- async function update_task(data) {
+async function update_task(data) {
   var query = ``;
+  let isCompletionUpdate = false; // 標記是否是完成狀態的更新
+
+  // 根據傳入的 status 選擇對應的 SQL 更新語句
   if (data.status == TASK_STATUS.IN_PROGRESS)
     query = TASK_QUERIES.UPDATE_TASK_STATUS.IN_PROGRESS;
 
-  if (data.status == TASK_STATUS.COMPLETED)
+  if (data.status == TASK_STATUS.COMPLETED) {
     query = TASK_QUERIES.UPDATE_TASK_STATUS.COMPLETED;
+    isCompletionUpdate = true; // 標記為完成更新
+  }
 
   if (data.status == TASK_STATUS.TERMINATED)
     query = TASK_QUERIES.UPDATE_TASK_STATUS.TERMINATED;
 
   if (data.status == TASK_STATUS.FILE_IO_ERROR)
     query = TASK_QUERIES.UPDATE_TASK_STATUS.FILE_IO_ERROR;
-    
+
+  // 如果 query 仍然是空的，表示傳入了未知的 status，記錄錯誤並返回
+  if (query === ``) {
+    logger(LOG_LEVEL.ERROR, `update_task called with unknown status: ${data.status} for objid: ${data.objid}`);
+    return; // 或者可以考慮 throw new Error(...) 向上層報告錯誤
+  }
+
   try {
     const pool = await pool_promise;
 
-    await pool.request()
-      .input('objid',sql.BigInt, data.objid)
-      .input('transcribe', sql.INT, data.transcribe)
-      .input('content_length', sql.INT, data.content_length)
-      .input('pid', sql.INT, data.pid)
+    // --- 執行資料庫狀態更新 ---
+    const dbResult = await pool.request() // 使用 await 確保操作完成
+      .input('objid', sql.BigInt, data.objid)
+      .input('transcribe', sql.INT, data.transcribe)       // 傳遞 transcribe 參數
+      .input('content_length', sql.INT, data.content_length) // 傳遞 content_length 參數
+      .input('pid', sql.INT, data.pid)                   // 傳遞 pid 參數
       .query(query);
 
+    // --- 資料庫更新成功後的日誌 ---
     const status_name = Object.keys(TASK_STATUS).find(key => TASK_STATUS[key] == data.status);
-    return logger(LOG_LEVEL.INFO, `Update the status of task ${data.objid} to ${status_name}.`);
-  } catch (err) {
-    logger(LOG_LEVEL.ERROR, `update_task ${err}.`);
-  }
-}     
+    // 確保 status_name 找到了對應的名稱，否則使用原始數字
+    const statusNameToLog = status_name ? status_name : `Unknown(${data.status})`;
+    logger(LOG_LEVEL.INFO, `Update the status of task ${data.objid} to ${statusNameToLog}.`);
 
+    // --- 如果是完成狀態，嘗試發送通知給 Go 後端 ---
+    if (isCompletionUpdate) {
+      // 從環境變數或設定檔獲取 Go 後端的內部 API URL
+      const goBackendNotifyUrl = process.env.GO_BACKEND_NOTIFY_URL || cfg.go_backend_notify_url;
+      logger(LOG_LEVEL.INFO, `DEBUG: GO_BACKEND_NOTIFY_URL value is: '${goBackendNotifyUrl}' (Type: ${typeof goBackendNotifyUrl})`);
+
+      if (!goBackendNotifyUrl) {
+        logger(LOG_LEVEL.ERROR, `Go backend notification URL (GO_BACKEND_NOTIFY_URL or cfg.go_backend_notify_url) is not configured. Cannot notify frontend for task ${data.objid}.`);
+      } else {
+        // 為了包含 FileName，需要再次查詢資料庫獲取
+        let systemFileName = "";
+        try {
+          const taskInfoResult = await pool.request()
+            .input('objid', sql.BigInt, data.objid)
+            .query('SELECT FILENAME FROM [AI_AP].[dbo].[TASK] WHERE OBJID = @objid');
+          if (taskInfoResult.recordset && taskInfoResult.recordset.length > 0) {
+            systemFileName = taskInfoResult.recordset[0].FILENAME;
+          } else {
+            logger(LOG_LEVEL.WARN, `Could not find FILENAME for task ${data.objid} when preparing notification.`);
+            // 即使找不到檔名，也可能需要繼續嘗試通知（如果 Go 不需要檔名也能工作）
+            // 但如果 Go 端需要 FileName，這裡應該記錄更嚴重的錯誤或跳過通知
+          }
+        } catch (dbError) {
+          logger(LOG_LEVEL.ERROR, `Error fetching FILENAME for notification (TaskID: ${data.objid}): ${dbError}`);
+          // 獲取檔名失敗，可能無法發送包含檔名的完整通知
+          // 根據需求決定是否繼續發送不含檔名的通知
+        }
+
+        const taskIDStr = data.objid.toString(); // 將 BigInt OBJID 轉為字串
+        // **重要**: 再次確認這個列表是否與 Go 後端期望的一致
+        const resultsList = ["TXT", "SRT", "VTT", "TSV", "JSON"];
+        // **重要**: 再次確認 TASK_STATUS.COMPLETED 的值 (假設是 2)
+        const finalStatusCodeInt = parseInt(TASK_STATUS.COMPLETED, 10);
+
+        if (isNaN(finalStatusCodeInt)) {
+          logger(LOG_LEVEL.ERROR, `Invalid TASK_STATUS.COMPLETED value: ${TASK_STATUS.COMPLETED}. Cannot format notification payload.`);
+        } else {
+          // 構建 payload，鍵名嚴格匹配 Go ReturnMessage 的 JSON 標籤
+          const payload = {
+            message: "Task completed", // Go struct 有此欄位
+            task_objid: taskIDStr,       // 匹配 `json:"task_objid"`
+            status: finalStatusCodeInt, // 匹配 `json:"status"` (傳遞數字 2)
+            results: resultsList,       // 匹配 `json:"results"`
+            filename: systemFileName    // 匹配 `json:"filename"`
+          };
+          logger(LOG_LEVEL.INFO, `Attempting to notify Go backend at ${goBackendNotifyUrl} for completed task ${taskIDStr} with payload: ${JSON.stringify(payload)}`);
+
+          // --- 使用 axios 發送 POST 請求 ---
+          try {
+            const response = await axios.post(goBackendNotifyUrl, payload, {
+              headers: { 'Content-Type': 'application/json' },
+              timeout: 5000 // 5 秒超時
+            });
+
+            // 檢查 Go 後端的回應
+            if (response.status === 200) {
+              logger(LOG_LEVEL.INFO, `Successfully notified Go backend for task ${taskIDStr}. Response: ${response.data}`);
+            } else {
+              // Go 後端返回了非 200 的狀態碼
+              logger(LOG_LEVEL.WARN, `Go backend notification for task ${taskIDStr} returned status ${response.status}: ${response.data}`);
+            }
+          } catch (notifyError) {
+            // axios 請求本身出錯 (網路、超時、Go服務器錯誤等)
+            logger(LOG_LEVEL.ERROR, `Failed to notify Go backend for task ${taskIDStr}: ${notifyError.message}`);
+            if (notifyError.response) {
+              // 如果錯誤包含來自 Go 的回應，記錄下來
+              logger(LOG_LEVEL.ERROR, `Go backend notification error details: Status ${notifyError.response.status}, Data: ${JSON.stringify(notifyError.response.data)}`);
+            } else if (notifyError.request) {
+              // 請求已發出但沒有收到回應
+              logger(LOG_LEVEL.ERROR, `Go backend notification error: No response received for task ${taskIDStr}. Request details: ${notifyError.request}`);
+            } else {
+              // 設置請求時出錯
+              logger(LOG_LEVEL.ERROR, `Go backend notification error: Error setting up request for task ${taskIDStr}: ${notifyError.message}`);
+            }
+            // 即使通知失敗，也不向上拋出錯誤，因為資料庫更新可能已成功
+          }
+          // --- 通知邏輯結束 ---
+        } // end if (!isNaN(finalStatusCodeInt))
+      } // end if (!goBackendNotifyUrl)
+    } // end if (isCompletionUpdate)
+
+    // 函數正常結束
+    return;
+
+  } catch (err) {
+    // 捕獲資料庫更新或其他在 try 塊中發生的錯誤
+    logger(LOG_LEVEL.ERROR, `update_task failed for objid ${data.objid}: ${err}.`);
+    // 根據需要，可以選擇在這裡向上拋出錯誤
+    // throw err;
+  }
+}
 /**
  * @brief Get file path for task transcription result
  *
@@ -465,7 +625,9 @@ async function cleanup_task_() {
  * @note Uses paths defined in config.js
  * @note Extensions are forced to lowercase
  */
-async function get_task_result_path(filename, file_type) {
+// task_service.js (修改 get_task_result_path)
+
+async function get_task_result_path(filenameWithExt, file_type) { // 修改參數名以示區分
   // Define paths for each file type in the configuration
   const download_paths = {
     TXT: 'transcribe_txt_path',
@@ -475,9 +637,24 @@ async function get_task_result_path(filename, file_type) {
     JSON: 'transcribe_json_path'
   };
 
-  const file_path = path.join(cfg.paths[download_paths[file_type]], `${filename}.${file_type.toLowerCase()}`);
+  // 檢查 file_type 是否有效
+  if (!download_paths[file_type]) {
+      throw new Error(`Unsupported file type requested: ${file_type}`);
+  }
+
+  // *** 新增：去除原始檔名中的副檔名 ***
+  const filenameBase = path.parse(filenameWithExt).name; // 使用 path.parse().name 获取不含扩展名的部分
+  // 例如 "audiofile-123.mp3" -> "audiofile-123"
+
+  // 使用去除副檔名的基礎名稱來拼接最終路徑
+  const file_path = path.join(cfg.paths[download_paths[file_type]], `${filenameBase}.${file_type.toLowerCase()}`);
+  // 現在會拼接成 C:\...\txt\audiofile-1745894216569.txt
+
+  logger(LOG_LEVEL.DEBUG, `[get_task_result_path] Trying to access file at path: ${file_path}`); // 增加調試日誌
 
   if (!fs.existsSync(file_path)) {
+    // 如果檔案仍然不存在，記錄更詳細的信息
+    logger(LOG_LEVEL.ERROR, `[get_task_result_path] File does not exist at calculated path: ${file_path}. Original filename input: ${filenameWithExt}, type: ${file_type}`);
     throw new Error(`The file ${file_path} does not exist.`);
   }
 

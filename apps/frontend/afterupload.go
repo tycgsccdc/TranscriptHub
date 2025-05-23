@@ -17,11 +17,13 @@ import (
 )
 
 // 科長那邊回傳的訊息
+// afterupload.go
 type ReturnMessage struct {
-   Message	string		`json:"message"`
-   TaskID	string		`json:"task_objid"`
-   Status	int		`json:"status"`  // 0)Error, 1)Canceled 5)pending 建好objid後，就傳這個status 10)finish
-   Results	[]string	`json:"results"`
+   Message  string   `json:"message"`
+   TaskID   string   `json:"task_objid"`
+   Status   int      `json:"status"`
+   Results  []string `json:"results"`
+   FileName string   `json:"filename"` // <-- 新增 FileName 欄位和標籤
 }
 
 func GetDataViaUrl(method, url, contentType string, payload *bytes.Buffer) ([]byte, error) {

@@ -1,0 +1,93 @@
+# Academia Sinica AI Suite (AISuite)
+
+AISuite 是一個專為中央研究院設計的 AI 工具套件，主要提供錄音檔案轉逐字稿的功能，並支援多種格式的檔案上傳與處理。此專案包含前端頁面與後端 API，並整合了中央研究院的 FISA 登入系統。
+
+---
+
+## 功能特色
+
+- 支援 MP3、WAV 等音訊格式的逐字稿轉換。
+- 提供多語言的前端頁面模板。
+- 支援 Docker 部署，快速啟動服務。
+- 提供 RESTful API，方便整合其他系統。
+- 自動化 Email 通知功能，提醒用戶處理結果。
+
+---
+
+## 系統需求
+
+- **Go** 1.20 或以上版本
+- **Docker** (可選)
+- **ffmpeg** (音訊處理工具)
+- **SMTP Server** (用於 Email 通知)
+
+---
+
+## 安裝方式
+
+### 方法一：使用原始碼進行安裝
+
+1. **Clone 專案**
+   ```sh
+   git clone https://github.com/your-repo/aisuite.git
+   cd aisuite
+   ```
+2. **安裝依賴**
+   ```sh
+   go mod tidy
+   make build
+   ```
+
+### 方法二：使用 Docker 安裝（推薦）
+
+1. **啟動 Docker 容器**
+   ```sh
+   make run
+   ```
+
+---
+
+## 使用方式
+
+1. **啟動應用程式**
+   ```sh
+   npm start
+   ```
+2. **開啟瀏覽器**
+   前往 `http://localhost:3000`
+
+---
+
+## 貢獻方式
+
+1. **Fork 專案**
+   ```sh
+   git fork https://github.com/your_username/repo_name.git
+   ```
+2. **建立新分支**
+   ```sh
+   git checkout -b feature/YourFeature
+   ```
+3. **提交修改**
+   ```sh
+   git commit -m 'Add some feature'
+   ```
+4. **推送到分支**
+   ```sh
+   git push origin feature/YourFeature
+   ```
+5. **開啟 Pull Request**
+
+---
+
+## 授權
+
+本專案採用 MIT 授權條款。詳情請參閱 `LICENSE` 文件。
+
+---
+
+## 聯絡方式
+
+Your Name - [@your_twitter](https://twitter.com/your_twitter) - your_email@example.com
+
+專案連結: [https://github.com/your_username/repo_name](https://github.com/your_username/repo_name)

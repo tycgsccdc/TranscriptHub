@@ -21,12 +21,7 @@ const LOG_LEVEL = {
   WARNING: 10,    /* Non-critical warnings */
   ERROR: 99       /* Critical system errors */
 };
-// const LOG_LEVEL = {
-//     INFO: 0,        /* General information logging */
-//     INFO_TABLE: 5,  /* Tabular data output */
-//     WARNING: 10,    /* Non-critical warnings */
-//     ERROR: 99       /* Critical system errors */
-// };
+
 
 
 /**
@@ -81,6 +76,7 @@ const NOTIFY_STATUS = {
  * @note Status codes are strings for database compatibility
  * @note Values ordered by lifecycle progression
  */
+
 const TASK_STATUS = {
   CREATED: '0',          /* Initial task creation */
   IN_PROGRESS: '1',      /* Active processing */
@@ -89,14 +85,6 @@ const TASK_STATUS = {
   TERMINATED: '-2',      /* System termination */
   FILE_IO_ERROR: '-3'    /* File operation failure */
 };
-// const TASK_STATUS = {
-//   CREATED: '0',
-//   IN_PROGRESS: '1',
-//   COMPLETED: '2',
-//   CANCELLED_BY_USER: '-1',
-//   TERMINATED: '-2',
-//   FILE_IO_ERROR: '-3'
-// };
 
 module.exports = {
   LOG_LEVEL,

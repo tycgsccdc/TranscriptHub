@@ -65,13 +65,25 @@ The system employs a multi-layered architecture:
 
 ### 環境需求 | Prerequisites
 - Node.js v18.20.3+
-- Python 3.9+ 與 Anaconda/Miniconda | Python 3.9+ with Anaconda/Miniconda
+- Python 3.8+ 與 Anaconda/Miniconda | Python 3.8+ with Anaconda/Miniconda
 - SQL Server 2019+
 - CUDA 支援的 NVIDIA GPU (建議 RTX 系列) | CUDA-compatible NVIDIA GPU (RTX series recommended)
 
 ### 安裝步驟 | Installation Steps
 
-1. **設定資料庫 | Set up Database**
+1. **設定 Python 環境 | Set up Python Environment**
+```bash
+# 建立獨立環境 | Create isolated environment
+conda create -n whisperx python=3.8
+conda activate whisperx
+
+# 安裝 WhisperX | Install WhisperX
+pip install git+https://github.com/m-bain/whisperx.git
+
+參考：[WhisperX GitHub](https://github.com/m-bain/whisperx)
+```
+
+2. **設定資料庫 | Set up Database**
 ```bash
 # 使用 Docker 快速部署 SQL Server | Quick deployment with Docker
 docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword' \
@@ -80,15 +92,6 @@ docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword' \
 
 # 或使用現有的 SQL Server 實例 | Or use existing SQL Server instance
 ```
-> [!TIP]  
-> SQLServer 2019 docker manual: https://learn.microsoft.com/zh-tw/sql/linux/quickstart-install-connect-docker
-
-2. **安裝 WhisperX | Install WhisperX**
-```bash
-# 請參考 [WhisperX GitHub](https://github.com/m-bain/whisperx) 的最新安裝指示。
-Please refer to [WhisperX GitHub](https://github.com/m-bain/whisperx) for the latest installation instructions.
-```
-
 
 3. **複製並配置專案 | Clone and Configure Project**
 ```bash
@@ -101,13 +104,13 @@ cp .env.example .env
 # 編輯 .env 設定資料庫連接與系統參數 | Edit .env file with database connection and system parameters
 
 # 配置系統設定 | Configure system settings
-cp scripts/config.json.example scripts/config.json
+cp config.json.example config.json
 # 編輯 config.json 設定系統路徑與轉錄參數 | Edit config.json with system paths and transcription parameters
   
 # 建立相關目錄 | Create Required Directories
-TASK_HOME=/data/transcribehub    # 專案根目錄 | Root directory for transcription tasks
-# ⚠️ 請確認此值與 .env 檔案內的 TASK_HOME 相同，避免路徑不一致導致檔案讀寫錯誤。 | ⚠️ Make sure this value matches the TASK_HOME in .env to avoid file path inconsistencies.
+TASK_HOME=/data/transcribehub    # 轉錄任務根目錄 | Root directory for transcription tasks
 
+# 依照 .env 中定義的 TASK_HOME 建立各目錄 | Create directories based on TASK_HOME defined in .env
 mkdir -p ${TASK_HOME}/upload            # 存放上傳檔案 | For uploaded files
 mkdir -p ${TASK_HOME}/uploadlc          # 存放處理後的上傳檔案 | For processed uploads
 mkdir -p ${TASK_HOME}/transcribe/txt    # 存放文字輸出 | For text output
@@ -123,7 +126,7 @@ pip install -r scripts/requirements.txt
 
 4. **安裝 Node.js 套件 | Install Node.js Packages**
 ```bash
-npm install
+npm ci
 ```
 
 5. **初始化資料庫 | Initialize Database**
@@ -133,9 +136,9 @@ node db-init.js
 # 或執行下列 SQL 腳本 (請依照實際資料庫設定修改連線資訊) | Or execute SQL scripts (modify connection settings accordingly)
 cd sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i createdb.sql
+sqlcmd -S localhost -U sa -P YourStrongPassword -i initial.sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i access_operation.sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i access_operation_error.sql
-sqlcmd -S localhost -U sa -P YourStrongPassword -i initial.sql
 sqlcmd -S localhost -U sa -P YourStrongPassword -i task.sql
 ```
 
@@ -363,7 +366,7 @@ apps/backend/
 ├── middlewares/                    # 中間件目錄 | Middleware directory
 │   └── validator_params.js         # 請求驗證中間件 | Request validation middleware
 ├── scripts/                        # 腳本目錄 | Scripts directory
-│   ├── config.example.json         # 轉錄引擎配置檔範例 | Transcription engine config example
+│   ├── config.json                 # 轉錄引擎配置檔 | Transcription engine config
 │   └── transcribe.py               # 轉錄處理主腳本 | Main transcription script
 ├── services/                       # 服務層目錄 | Services directory
 │   └── task_service.js             # 轉錄服務 | Transcription service

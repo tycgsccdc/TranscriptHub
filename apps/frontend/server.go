@@ -17,13 +17,8 @@ func mkSlice(args ...interface{}) []interface{} {
 }
 
 func main() {
-   currentDir, err := os.Getwd()
-   if err != nil {
-      fmt.Println(err.Error())
-      return
-   }
-   if err := godotenv.Load(currentDir + "/envfile"); err != nil {
-      fmt.Println(err.Error())
+   if err := godotenv.Load("envfile"); err != nil {
+      fmt.Println("Error loading .env file")
       return
    }
    port := os.Getenv("PORT")
